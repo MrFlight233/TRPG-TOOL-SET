@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TRPG工具集 - 首页</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            padding: 15px;
+            padding-bottom: env(safe-area-inset-bottom, 15px);
+            overflow-x: hidden;
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: clamp(20px, 5vw, 30px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 10px;
+        }
+        
+        header {
+            margin-bottom: clamp(20px, 4vw, 30px);
+        }
+        
+        h1 {
+            font-size: clamp(2rem, 7vw, 3rem);
+            margin-bottom: 8px;
+            background: linear-gradient(to right, #ff8a00, #da1b60);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            line-height: 1.2;
+        }
+        
+        .subtitle {
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+        
+        .intro-text {
+            font-size: clamp(0.95rem, 3.5vw, 1.1rem);
+            line-height: 1.6;
+            margin-bottom: clamp(20px, 4vw, 30px);
+            color: #e0e0e0;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .tools-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: clamp(15px, 3vw, 20px);
+            margin: clamp(20px, 4vw, 30px) 0;
+        }
+        
+        @media (min-width: 768px) {
+            .tools-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        .tool-card {
+            background: rgba(30, 30, 50, 0.8);
+            border-radius: 14px;
+            padding: clamp(20px, 3vw, 25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            height: 100%;
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            background: rgba(40, 40, 60, 0.9);
+        }
+        
+        .tool-icon {
+            font-size: clamp(2.5rem, 6vw, 3.5rem);
+            margin-bottom: 15px;
+            color: #4fc3f7;
+            background: rgba(79, 195, 247, 0.1);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .tool-card h2 {
+            font-size: clamp(1.3rem, 4vw, 1.6rem);
+            margin-bottom: 12px;
+            color: #4fc3f7;
+        }
+        
+        .tool-card p {
+            font-size: clamp(0.9rem, 2.8vw, 1rem);
+            line-height: 1.5;
+            margin-bottom: 20px;
+            color: #e0e0e0;
+            flex-grow: 1;
+        }
+        
+        .tool-btn {
+            display: inline-block;
+            background: linear-gradient(45deg, #2196F3, #21CBF3);
+            color: white;
+            padding: 12px 25px;
+            font-size: clamp(0.9rem, 2.8vw, 1.1rem);
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            touch-action: manipulation;
+            width: 100%;
+            max-width: 200px;
+        }
+        
+        .tool-btn:hover, .tool-btn:active {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(33, 150, 243, 0.6);
+            background: linear-gradient(45deg, #21CBF3, #2196F3);
+        }
+        
+        .tool-btn i {
+            margin-right: 8px;
+        }
+        
+        .dice-animation {
+            display: flex;
+            justify-content: center;
+            gap: clamp(10px, 2vw, 15px);
+            margin: clamp(15px, 3vw, 25px) 0;
+            flex-wrap: wrap;
+        }
+        
+        .die {
+            width: clamp(40px, 8vw, 50px);
+            height: clamp(40px, 8vw, 50px);
+            background: white;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: clamp(16px, 3.5vw, 20px);
+            font-weight: bold;
+            color: #333;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: roll 3s infinite;
+        }
+        
+        .die:nth-child(2) { animation-delay: 0.5s; }
+        .die:nth-child(3) { animation-delay: 1s; }
+        .die:nth-child(4) { animation-delay: 1.5s; }
+        
+        @keyframes roll {
+            0% { transform: rotate(0deg) translateY(0); }
+            25% { transform: rotate(90deg) translateY(-10px); }
+            50% { transform: rotate(180deg) translateY(0); }
+            75% { transform: rotate(270deg) translateY(10px); }
+            100% { transform: rotate(360deg) translateY(0); }
+        }
+        
+        footer {
+            margin-top: clamp(20px, 4vw, 30px);
+            font-size: 0.85rem;
+            opacity: 0.7;
+            padding: 10px 0;
+        }
+        
+        /* 移动端触摸优化 */
+        @media (max-width: 768px) {
+            .container {
+                margin: 5px;
+                padding: 20px;
+                border-radius: 14px;
+            }
+            
+            .tools-grid {
+                gap: 15px;
+            }
+            
+            .tool-card {
+                padding: 20px;
+            }
+            
+            .tool-btn {
+                padding: 14px 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .tools-grid {
+                gap: 12px;
+            }
+            
+            .tool-card {
+                padding: 18px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .subtitle {
+                font-size: 0.95rem;
+            }
+        }
+        
+        /* 防止IOS缩放 */
+        @supports (-webkit-overflow-scrolling: touch) {
+            input, select, textarea {
+                font-size: 16px !important;
+            }
+        }
+        
+        /* 涟漪效果 */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.7);
+            transform: scale(0);
+            animation: ripple-animation 0.6s linear;
+            pointer-events: none;
+        }
+        
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+        
+        /* 安全区域适配 */
+        @supports (padding: max(0px)) {
+            body {
+                padding-left: max(15px, env(safe-area-inset-left, 15px));
+                padding-right: max(15px, env(safe-area-inset-right, 15px));
+                padding-bottom: max(15px, env(safe-area-inset-bottom, 15px));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>TRPG 工具集</h1>
+            <p class="subtitle">为您的跑团游戏提供便捷工具</p>
+        </header>
+        
+        <div class="dice-animation">
+            <div class="die">⚀</div>
+            <div class="die">⚁</div>
+            <div class="die">⚂</div>
+            <div class="die">⚃</div>
+        </div>
+        
+        <p class="intro-text">
+            这里汇集了跑团游戏中常用的实用工具，帮助您专注于游戏体验，简化繁琐的操作。
+        </p>
+        
+        <div class="tools-grid">
+            <!-- 规则网站集 -->
+            <div class="tool-card">
+                <div class="tool-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <h2>网站资源集</h2>
+                <p>汇集各类TRPG规则相关的网站资源，快速查找您需要的规则信息、扩展内容和社区讨论。</p>
+                <a href="小工具/网站资源集.html" class="tool-btn">
+                    <i class="fas fa-external-link-alt"></i> 访问网站资源
+                </a>
+            </div>
+            
+            <!-- 骰子模拟器 -->
+            <div class="tool-card">
+                <div class="tool-icon">
+                    <i class="fas fa-dice-d20"></i>
+                </div>
+                <h2>骰子模拟器</h2>
+                <p>支持多种骰子类型组合投掷，可附加调整值，记录投掷历史并计算期望值，满足复杂投掷需求。</p>
+                <a href="小工具/骰子模拟器.html" class="tool-btn">
+                    <i class="fas fa-play-circle"></i> 使用模拟器
+                </a>
+            </div>
+            
+            <!-- Token制作器 -->
+            <div class="tool-card">
+                <div class="tool-icon">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <h2>Token制作器</h2>
+                <p>简单易用的虚拟棋子制作工具，自定义外观和标识，为您的在线跑团游戏创建个性化角色标记。</p>
+                <a href="小工具/token制作器.html" class="tool-btn">
+                    <i class="fas fa-paint-brush"></i> 制作Token
+                </a>
+            </div>
+
+            <!-- 跑团信息记录 -->
+            <div class="tool-card">
+                <div class="tool-icon">
+                    <i class="fas fa-file-alt    "></i>
+                </div>
+                <h2>跑团记录</h2>
+                <p>简单跑团记录工具，开团时间、玩家列表、日志记录、loot记录</p>
+                <a href="跑团记录/跑团记录.html" class="tool-btn">
+                    <i class="fas fa-pen"></i> 跑团记录
+                </a>
+            </div>
+
+            <!-- 角色背景故事生成 -->
+            <div class="tool-card">
+                <div class="tool-icon">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <h2>背景故事生成</h2>
+                <p>通过AI智能体生成角色的背景故事，帮助您快速创建有趣的角色介绍。</p>
+                <a href="小工具/背景故事生成.html" class="tool-btn">
+                    <i class="fas fa-robot"></i> 背景生成
+                </a>
+            </div>
+    
+        </div>
+        
+        <footer>
+            <p>© 2025 TRPG工具集 | 为桌游爱好者打造</p>
+            <a href="http://beian.miit.gov.cn/" style="color: #e0e0e0;">陕ICP备2026000938号</a>
+        </footer>
+    </div>
+
+    <script>
+        // 添加按钮点击涟漪效果
+        document.querySelectorAll('.tool-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // 创建涟漪效果
+                const ripple = document.createElement('span');
+                ripple.classList.add('ripple');
+                this.appendChild(ripple);
+                
+                // 获取点击位置
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size/2;
+                const y = e.clientY - rect.top - size/2;
+                
+                // 设置涟漪位置和大小
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                
+                // 添加动画类
+                ripple.classList.add('animate');
+                
+                // 延迟跳转
+                setTimeout(() => {
+                    window.location.href = this.getAttribute('href');
+                }, 300);
+            });
+        });
+        
+        // 添加骰子动画
+        const dice = document.querySelectorAll('.die');
+        dice.forEach(die => {
+            die.addEventListener('click', () => {
+                die.style.animation = 'none';
+                setTimeout(() => {
+                    die.style.animation = 'roll 1s ease';
+                }, 10);
+            });
+        });
+        
+        // 移动端优化：防止双击缩放
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    </script>
+</body>
+</html>

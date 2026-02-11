@@ -1,0 +1,3996 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>跑团信息记录</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+            color: white;
+            padding: 10px;
+            padding-bottom: env(safe-area-inset-bottom, 10px);
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .container {
+            max-width: 95vw;
+            width: 95vw;
+            min-width: 1200px;
+            min-height: 800px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: clamp(15px, 3vw, 25px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 5px auto;
+        }
+
+        header {
+            margin-bottom: clamp(15px, 3vw, 25px);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: clamp(1.8rem, 6vw, 2.8rem);
+            margin-bottom: 6px;
+            background: linear-gradient(to right, #ff8a00, #da1b60);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: clamp(0.85rem, 2.5vw, 1rem);
+            opacity: 0.8;
+            line-height: 1.4;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            z-index: 100;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            min-height: 600px;
+        }
+
+        @media (min-width: 1024px) {
+            .main-content {
+                flex-direction: row;
+                min-height: 600px;
+            }
+
+            /* 修改为20%/80%比例 */
+            .campaigns-panel {
+                flex: 0 0 20%;
+                min-width: 200px;
+            }
+
+            .details-panel {
+                flex: 0 0 80%;
+                min-width: 1000px;
+            }
+        }
+
+        /* 左侧跑团列表 */
+        .campaigns-panel {
+            flex: 1;
+            min-width: 200px;
+            max-width: 300px;
+            background: rgba(30, 30, 50, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            max-height: none;
+            min-height: 600px;
+            height: auto;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .panel-header h2 {
+            font-size: 1.3rem;
+            color: #4fc3f7;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #2196F3, #21CBF3);
+            color: white;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(33, 150, 243, 0.6);
+        }
+
+        .campaigns-list {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .campaign-item {
+            background: rgba(40, 40, 60, 0.6);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid #4fc3f7;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .campaign-item:hover {
+            background: rgba(50, 50, 70, 0.8);
+            transform: translateX(5px);
+        }
+
+        .campaign-item.active {
+            background: rgba(79, 195, 247, 0.2);
+            border-left-color: #ff8a00;
+        }
+
+        .campaign-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 4px;
+            color: #4fc3f7;
+        }
+
+        .campaign-gm {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 4px;
+        }
+
+        .campaign-next-date {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .campaign-next-date i {
+            color: #ff8a00;
+        }
+
+        .campaign-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-icon {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .btn-icon:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        /* 右侧详细信息 */
+        .details-panel {
+            flex: 2;
+            background: rgba(30, 30, 50, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            max-height: none;
+            min-height: 600px;
+            height: auto;
+            min-width: 900px;
+        }
+
+        .campaign-details {
+            flex: 0 0 auto;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            min-height: 130px;
+            max-height: none;
+            overflow-y: auto;
+        }
+
+        .campaign-details h2 {
+            font-size: 1.6rem;
+            color: #ff8a00;
+            margin-bottom: 12px;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 12px;
+        }
+
+        .detail-item {
+            margin-bottom: 8px;
+        }
+
+        .detail-label {
+            font-size: 0.85rem;
+            opacity: 0.7;
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            font-size: 1rem;
+            color: #e0e0e0;
+        }
+
+        /* 玩家列表 */
+        .players-section {
+            flex: 0 0 auto;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            min-height: 180px;
+            max-height: none;
+            overflow-y: auto;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .section-header h2 {
+            font-size: 1.3rem;
+            color: #4fc3f7;
+        }
+
+        /* Tab导航 */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 15px;
+        }
+
+        .tab-btn {
+            padding: 10px 15px;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            color: white;
+        }
+
+        .tab-btn.active {
+            color: #4fc3f7;
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: #4fc3f7;
+            border-radius: 3px 3px 0 0;
+        }
+
+        .tab-content {
+            flex: 1;
+            overflow-y: auto;
+            max-height: none;
+            min-height: 400px;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* 表格样式 */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+        }
+
+        .data-table th {
+            background: rgba(79, 195, 247, 0.2);
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: bold;
+            color: #4fc3f7;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        /* 优化排序图标样式 */
+        .data-table th.sortable {
+            position: relative;
+            padding-right: 35px !important;
+        }
+
+        .data-table th.sortable i {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8em;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        .data-table th.sortable:hover {
+            background: rgba(79, 195, 247, 0.3);
+        }
+
+        .data-table th.sortable:hover i {
+            opacity: 1;
+        }
+
+        .data-table th.sortable i.fa-sort-up {
+            color: #4fc3f7;
+            opacity: 1;
+        }
+
+        .data-table th.sortable i.fa-sort-down {
+            color: #4fc3f7;
+            opacity: 1;
+        }
+
+        .data-table th i {
+            margin-left: 5px;
+            font-size: 0.8em;
+            opacity: 0.7;
+        }
+
+        .data-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .data-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* 操作按钮横向排列 */
+        .action-buttons {
+            display: flex;
+            gap: 6px;
+            flex-wrap: nowrap;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 15px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        /* 表单模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(30, 30, 50, 0.95);
+            border-radius: 12px;
+            padding: 20px;
+            width: 95%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            font-size: 1.3rem;
+            color: #4fc3f7;
+        }
+
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.3rem;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #e0e0e0;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            color: white;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        /* 优化下拉框样式 */
+        select.form-control {
+            background-color: rgba(40, 40, 60, 0.9);
+            color: #ffffff;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234fc3f7'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 18px;
+            padding-right: 40px;
+        }
+
+        select.form-control option {
+            background-color: #2a2a3a;
+            color: #ffffff;
+            padding: 10px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #4fc3f7;
+            box-shadow: 0 0 0 2px rgba(79, 195, 247, 0.2);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* 统计信息 */
+        .stats-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 15px 0;
+            padding: 12px;
+            background: rgba(40, 40, 60, 0.6);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-card {
+            background: rgba(79, 195, 247, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            flex: 1;
+            min-width: 130px;
+            border-left: 4px solid #4fc3f7;
+            text-align: center;
+        }
+
+        .stat-card h4 {
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+            color: #4fc3f7;
+        }
+
+        .stat-value {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #ff8a00;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 1023px) {
+            .main-content {
+                flex-direction: column;
+                height: auto;
+                min-height: auto;
+                gap: 12px;
+            }
+
+            .campaigns-panel,
+            .details-panel {
+                width: 100%;
+                max-height: none;
+                height: auto;
+                min-height: 350px;
+                padding: 12px;
+            }
+
+            .container {
+                max-width: 100%;
+                width: 100%;
+                min-width: auto;
+                padding: 10px;
+                margin: 0;
+                border-radius: 10px;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 5px;
+            }
+
+            .container {
+                padding: 8px;
+                margin: 0;
+                border-radius: 8px;
+                min-height: auto;
+            }
+
+            .tabs {
+                overflow-x: auto;
+                white-space: nowrap;
+                display: flex;
+                flex-wrap: nowrap;
+                margin-bottom: 12px;
+            }
+
+            .tab-btn {
+                white-space: nowrap;
+                padding: 8px 12px;
+                font-size: 0.85rem;
+                flex-shrink: 0;
+            }
+
+            /* 表格容器样式 - 支持横向滚动 */
+            .data-table-container {
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                margin-bottom: 12px;
+                border-radius: 6px;
+                background: rgba(30, 30, 50, 0.6);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .data-table {
+                display: table;
+                width: auto;
+                min-width: 100%;
+                font-size: 0.75rem;
+                margin-top: 0;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 8px 6px;
+                white-space: nowrap;
+                min-width: 70px;
+            }
+
+            /* 玩家表格特定列宽 */
+            #playersTable th:nth-child(1),
+            #playersTable td:nth-child(1) {
+                min-width: 90px;
+                /* 玩家名 */
+            }
+
+            #playersTable th:nth-child(2),
+            #playersTable td:nth-child(2) {
+                min-width: 90px;
+                /* 角色名 */
+            }
+
+            #playersTable th:nth-child(3),
+            #playersTable td:nth-child(3) {
+                min-width: 100px;
+                /* 职业&等级 */
+            }
+
+            #playersTable th:nth-child(4),
+            #playersTable td:nth-child(4) {
+                min-width: 60px;
+                /* 编号 */
+            }
+
+            #playersTable th:nth-child(5),
+            #playersTable td:nth-child(5) {
+                min-width: 70px;
+                /* 势力 */
+            }
+
+            #playersTable th:nth-child(6),
+            #playersTable td:nth-child(6) {
+                min-width: 100px;
+                /* 备注 */
+            }
+
+            #playersTable th:nth-child(7),
+            #playersTable td:nth-child(7) {
+                min-width: 45px;
+                /* 操作 */
+                z-index: 1;
+            }
+
+            /* 日志表格特定列宽 */
+            #logsTable th:nth-child(1),
+            #logsTable td:nth-child(1) {
+                min-width: 120px;
+                /* 时间 */
+            }
+
+            #logsTable th:nth-child(2),
+            #logsTable td:nth-child(2) {
+                min-width: 80px;
+                /* 玩家 */
+            }
+
+            #logsTable th:nth-child(3),
+            #logsTable td:nth-child(3) {
+                min-width: 120px;
+                /* 简述 */
+                white-space: normal;
+            }
+
+            #logsTable th:nth-child(4),
+            #logsTable td:nth-child(4) {
+                min-width: 150px;
+                /* 详述 */
+                white-space: normal;
+            }
+
+            #logsTable th:nth-child(5),
+            #logsTable td:nth-child(5) {
+                min-width: 45px;
+                /* 操作 */
+                z-index: 1;
+            }
+
+            /* Loot表格特定列宽 */
+            #lootTable th:nth-child(1),
+            #lootTable td:nth-child(1) {
+                min-width: 100px;
+                /* 创建时间 */
+            }
+
+            #lootTable th:nth-child(2),
+            #lootTable td:nth-child(2) {
+                min-width: 100px;
+                /* 名称 */
+            }
+
+            #lootTable th:nth-child(3),
+            #lootTable td:nth-child(3) {
+                min-width: 60px;
+                /* 数量 */
+            }
+
+            #lootTable th:nth-child(4),
+            #lootTable td:nth-child(4) {
+                min-width: 70px;
+                /* 单价 */
+            }
+
+            #lootTable th:nth-child(5),
+            #lootTable td:nth-child(5) {
+                min-width: 70px;
+                /* 总价 */
+            }
+
+            #lootTable th:nth-child(6),
+            #lootTable td:nth-child(6) {
+                min-width: 70px;
+                /* 类型 */
+            }
+
+            #lootTable th:nth-child(7),
+            #lootTable td:nth-child(7) {
+                min-width: 70px;
+                /* 是否出售 */
+            }
+
+            #lootTable th:nth-child(8),
+            #lootTable td:nth-child(8) {
+                min-width: 70px;
+                /* 出售单价 */
+            }
+
+            #lootTable th:nth-child(9),
+            #lootTable td:nth-child(9) {
+                min-width: 70px;
+                /* 出售数量 */
+            }
+
+            #lootTable th:nth-child(10),
+            #lootTable td:nth-child(10) {
+                min-width: 80px;
+                /* 现归属人 */
+            }
+
+            #lootTable th:nth-child(11),
+            #lootTable td:nth-child(11) {
+                min-width: 80px;
+                /* 获取日期 */
+            }
+
+            #lootTable th:nth-child(12),
+            #lootTable td:nth-child(12) {
+                min-width: 45px;
+                /* 操作 */
+                z-index: 1;
+            }
+
+            /* 隐藏不需要的列 */
+            .data-table th.hidden-mobile,
+            .data-table td.hidden-mobile {
+                display: none;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 4px;
+                min-width: 60px;
+            }
+
+            /* 玩家分配统计表格 */
+            .players-distribution-table {
+                width: 100%;
+                overflow-x: auto;
+                display: block;
+            }
+
+            /* 过滤条件样式调整 */
+            .filter-container {
+                flex-direction: column;
+                gap: 8px;
+                align-items: stretch;
+                margin-bottom: 12px;
+            }
+
+            .filter-group {
+                min-width: 100%;
+                margin-bottom: 5px;
+            }
+
+            .filter-reset-btn {
+                align-self: stretch;
+                height: 36px;
+            }
+
+            /* 详情面板最小宽度调整 */
+            .details-panel {
+                min-width: auto;
+                padding: 10px;
+            }
+
+            .campaigns-panel {
+                padding: 10px;
+            }
+
+            /* 分享按钮调整 */
+            .campaign-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+
+            .share-btn {
+                align-self: flex-start;
+            }
+
+            .modal-content {
+                padding: 15px;
+                width: 98%;
+            }
+
+            .empty-state {
+                padding: 25px 10px;
+            }
+
+            .empty-state i {
+                font-size: 2rem;
+            }
+
+            /* 按钮样式调整 */
+            .btn-primary,
+            .btn-secondary {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+
+            .btn-icon {
+                width: 26px;
+                height: 26px;
+            }
+
+            /* 面板头部间距调整 */
+            .panel-header {
+                margin-bottom: 12px;
+                padding-bottom: 8px;
+            }
+
+            .section-header {
+                margin-bottom: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 3px;
+            }
+
+            .container {
+                padding: 6px;
+            }
+
+            .back-btn {
+                top: 5px;
+                left: 5px;
+                padding: 5px 10px;
+                font-size: 0.75rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+                margin-bottom: 4px;
+            }
+
+            .subtitle {
+                font-size: 0.75rem;
+            }
+
+            .campaigns-panel,
+            .details-panel {
+                padding: 8px;
+            }
+
+            .panel-header h2 {
+                font-size: 1.1rem;
+            }
+
+            .campaign-name {
+                font-size: 1rem;
+            }
+
+            .campaign-gm {
+                font-size: 0.8rem;
+            }
+
+            .campaign-next-date {
+                font-size: 0.75rem;
+            }
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(79, 195, 247, 0.5);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(79, 195, 247, 0.8);
+        }
+
+        /* 玩家分配统计表格样式 */
+        .players-distribution-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+            margin-bottom: 15px;
+            background: rgba(30, 30, 50, 0.8);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .players-distribution-table th {
+            background: rgba(79, 195, 247, 0.2);
+            padding: 8px 12px;
+            text-align: left;
+            font-weight: bold;
+            color: #4fc3f7;
+        }
+
+        .players-distribution-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .players-distribution-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* 表格优化 */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+            font-size: 0.85rem;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 8px 10px;
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* 日志表格详述列宽度60% */
+        #logsTable th:nth-child(4),
+        #logsTable td:nth-child(4) {
+            width: 50%;
+            white-space: normal;
+            min-width: 250px;
+        }
+
+        /* 过滤条件样式 */
+        .filter-container {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            min-width: 180px;
+        }
+
+        .filter-label {
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+            color: #e0e0e0;
+        }
+
+        .filter-input {
+            padding: 6px 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        /* 统一过滤条件下拉框样式 */
+        .filter-input.select {
+            background-color: rgba(40, 40, 60, 0.9);
+            color: #ffffff;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234fc3f7'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 14px;
+            padding-right: 30px;
+        }
+
+        .filter-input.select option {
+            background-color: #2a2a3a;
+            color: #ffffff;
+            padding: 8px;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: #4fc3f7;
+            box-shadow: 0 0 0 2px rgba(79, 195, 247, 0.2);
+        }
+
+        /* 重置按钮 */
+        .filter-reset-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 6px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            height: 34px;
+            align-self: flex-end;
+        }
+
+        .filter-reset-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* loot统计信息布局调整 - 紧凑设计 */
+        .loot-stats-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 15px 0;
+            background: rgba(40, 40, 60, 0.6);
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* 紧凑型统计卡片 */
+        .compact-stat-card {
+            background: rgba(79, 195, 247, 0.1);
+            border-radius: 6px;
+            padding: 12px;
+            border-left: 4px solid #4fc3f7;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .compact-stat-card h4 {
+            font-size: 0.95rem;
+            color: #4fc3f7;
+            margin: 0;
+            white-space: nowrap;
+        }
+
+        .compact-stat-card .stat-value {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #ff8a00;
+            margin: 0;
+        }
+
+        /* 玩家分配统计表格样式更新 */
+        #playersDistributionTable {
+            margin-top: 8px;
+        }
+
+        #playersDistributionTable h3 {
+            font-size: 1.1rem;
+            color: #4fc3f7;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        #playersDistributionTable h3 i {
+            color: #ff8a00;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .compact-stat-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+                padding: 10px;
+            }
+
+            .compact-stat-card h4 {
+                font-size: 0.9rem;
+            }
+
+            .compact-stat-card .stat-value {
+                font-size: 1.1rem;
+            }
+
+            /* 玩家分配统计表格移动端适配 */
+            .players-distribution-table {
+                width: 100%;
+                overflow-x: auto;
+                display: block;
+            }
+
+            .loot-stats-container {
+                padding: 12px;
+            }
+        }
+
+        /* 优化滚动条 */
+        .tab-content::-webkit-scrollbar,
+        .campaign-details::-webkit-scrollbar,
+        .players-section::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .tab-content::-webkit-scrollbar-track,
+        .campaign-details::-webkit-scrollbar-track,
+        .players-section::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        .tab-content::-webkit-scrollbar-thumb,
+        .campaign-details::-webkit-scrollbar-thumb,
+        .players-section::-webkit-scrollbar-thumb {
+            background: rgba(79, 195, 247, 0.5);
+            border-radius: 4px;
+        }
+
+        .tab-content::-webkit-scrollbar-thumb:hover,
+        .campaign-details::-webkit-scrollbar-thumb:hover,
+        .players-section::-webkit-scrollbar-thumb:hover {
+            background: rgba(79, 195, 247, 0.8);
+        }
+
+        .campaigns-list,
+        .tab-content,
+        .campaign-details,
+        .players-section,
+        .data-table {
+            overflow-y: auto;
+        }
+
+        .campaigns-list::-webkit-scrollbar,
+        .tab-content::-webkit-scrollbar,
+        .campaign-details::-webkit-scrollbar,
+        .players-section::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .campaigns-list::-webkit-scrollbar-track,
+        .tab-content::-webkit-scrollbar-track,
+        .campaign-details::-webkit-scrollbar-track,
+        .players-section::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        .campaigns-list::-webkit-scrollbar-thumb,
+        .tab-content::-webkit-scrollbar-thumb,
+        .campaign-details::-webkit-scrollbar-thumb,
+        .players-section::-webkit-scrollbar-thumb {
+            background: rgba(79, 195, 247, 0.5);
+            border-radius: 4px;
+        }
+
+        .campaigns-list::-webkit-scrollbar-thumb:hover,
+        .tab-content::-webkit-scrollbar-thumb:hover,
+        .campaign-details::-webkit-scrollbar-thumb:hover,
+        .players-section::-webkit-scrollbar-thumb:hover {
+            background: rgba(79, 195, 247, 0.8);
+        }
+
+        /* 新增样式 */
+        .log-summary-cell {
+            max-width: 200px;
+            white-space: normal;
+            word-wrap: break-word;
+            line-height: 1.3;
+            padding: 6px 8px;
+            color: #e0e0e0;
+        }
+
+        .log-details-cell {
+            max-width: 250px;
+            white-space: normal;
+            word-wrap: break-word;
+            line-height: 1.3;
+            padding: 6px 8px;
+            cursor: pointer;
+            position: relative;
+            color: #e0e0e0;
+        }
+
+        .log-details-cell:hover {
+            background-color: rgba(79, 195, 247, 0.1);
+            border-radius: 3px;
+        }
+
+        /* 修改"查看更多"样式 - 只在悬停时显示 */
+        .log-details-cell .view-more {
+            font-size: 0.75rem;
+            color: #ff8a00;
+            margin-left: 4px;
+            opacity: 0.7;
+            display: none;
+        }
+
+        .log-details-cell:hover .view-more {
+            display: inline;
+        }
+
+        /* 详情模态框 */
+        .detail-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .detail-modal.active {
+            display: flex;
+        }
+
+        .detail-modal-content {
+            background: rgba(30, 30, 50, 0.95);
+            border-radius: 10px;
+            padding: 20px;
+            width: 95%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .detail-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .detail-modal-header h3 {
+            font-size: 1.2rem;
+            color: #4fc3f7;
+            margin: 0;
+        }
+
+        .detail-modal-body {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #e0e0e0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 60vh;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+
+        .detail-modal-body.empty {
+            color: rgba(255, 255, 255, 0.5);
+            font-style: italic;
+        }
+
+        .detail-close-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .detail-close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+
+            .log-summary-cell,
+            .log-details-cell {
+                max-width: 120px;
+            }
+
+            .detail-modal-content {
+                width: 98%;
+                padding: 15px;
+            }
+        }
+
+        /* 优化表格行高 */
+        #logsTable tbody tr {
+            height: auto;
+            min-height: 50px;
+        }
+
+        #logsTable td {
+            vertical-align: top;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        /* 分享按钮样式 */
+        .share-btn {
+            background: rgba(79, 195, 247, 0.2);
+            border: 1px solid rgba(79, 195, 247, 0.4);
+            color: #4fc3f7;
+            padding: 6px 12px;
+            border-radius: 18px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            border: none;
+        }
+
+        .share-btn:hover {
+            background: rgba(79, 195, 247, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .share-btn.copied {
+            background: rgba(76, 175, 80, 0.2);
+            border-color: rgba(76, 175, 80, 0.4);
+            color: #4CAF50;
+        }
+
+        .share-btn.copied i {
+            color: #4CAF50;
+        }
+
+        .campaign-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        /* 移动端分享按钮调整 */
+        @media (max-width: 768px) {
+            .campaign-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .share-btn {
+                align-self: flex-start;
+            }
+        }
+
+        /* 分享链接样式 - 新增 */
+        .share-link-container {
+            background: rgba(40, 40, 60, 0.8);
+            border-radius: 6px;
+            padding: 12px;
+            margin: 12px 0;
+            border: 1px solid rgba(79, 195, 247, 0.3);
+            word-break: break-all;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
+        .share-link {
+            color: #4fc3f7;
+            text-decoration: none;
+        }
+
+        .share-link:hover {
+            text-decoration: underline;
+            color: #ff8a00;
+        }
+
+        .share-instructions {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 8px;
+            line-height: 1.3;
+        }
+
+        .copy-btn {
+            background: linear-gradient(45deg, #4CAF50, #8BC34A);
+            color: white;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-left: 8px;
+        }
+
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.6);
+        }
+
+        .copy-btn.copied {
+            background: linear-gradient(45deg, #2196F3, #21CBF3);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
+        }
+
+        .copy-btn.copied:hover {
+            box-shadow: 0 8px 20px rgba(33, 150, 243, 0.6);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 保持HTML内容不变 -->
+    <div class="container">
+        <a href="../index.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i> 返回首页
+        </a>
+
+        <header>
+            <h1>跑团信息记录</h1>
+            <p class="subtitle">管理您的跑团信息、玩家记录、游戏日志和战利品分配</p>
+        </header>
+
+        <div class="main-content">
+            <!-- 左侧跑团列表 -->
+            <div class="campaigns-panel">
+                <div class="panel-header">
+                    <h2>跑团列表</h2>
+                    <button class="btn-primary" id="addCampaignBtn">
+                        <i class="fas fa-plus"></i> 新建跑团
+                    </button>
+                </div>
+
+                <div class="campaigns-list" id="campaignsList">
+                    <!-- 跑团列表将在这里动态生成 -->
+                    <div class="empty-state">
+                        <i class="fas fa-dice-d20"></i>
+                        <p>暂无跑团记录，点击上方按钮创建第一个跑团</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧详细信息 -->
+            <div class="details-panel">
+                <!-- 跑团详细信息 -->
+                <div class="campaign-details" id="campaignDetails">
+                    <div class="empty-state">
+                        <i class="fas fa-hand-pointer"></i>
+                        <p>请从左侧选择一个跑团查看详细信息</p>
+                    </div>
+                </div>
+
+                <!-- 玩家列表 -->
+                <div class="players-section" id="playersSection" style="display: none;">
+                    <div class="section-header">
+                        <h2>玩家列表</h2>
+                        <button class="btn-primary" id="addPlayerBtn">
+                            <i class="fas fa-user-plus"></i> 添加玩家
+                        </button>
+                    </div>
+
+                    <div class="empty-state" id="playersEmpty">
+                        <i class="fas fa-users"></i>
+                        <p>暂无玩家信息，点击上方按钮添加玩家</p>
+                    </div>
+
+                    <div class="data-table-container">
+                        <table class="data-table" id="playersTable" style="display: none;">
+                            <thead>
+                                <tr>
+                                    <th class="sortable" data-sort="playerName">玩家名 <i class="fas fa-sort"></i></th>
+                                    <th class="sortable" data-sort="characterName">角色名 <i class="fas fa-sort"></i></th>
+                                    <th class="sortable" data-sort="characterClass">职业&等级 <i class="fas fa-sort"></i>
+                                    </th>
+                                    <th class="sortable" data-sort="number">编号 <i class="fas fa-sort"></i></th>
+                                    <th class="sortable" data-sort="faction">势力 <i class="fas fa-sort"></i></th>
+                                    <th class="sortable" data-sort="notes">备注 <i class="fas fa-sort"></i></th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="playersTableBody">
+                                <!-- 玩家数据将在这里动态生成 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab页 -->
+                <div class="tabs" id="detailTabs" style="display: none;">
+                    <button class="tab-btn active" data-tab="logs">日志记录</button>
+                    <button class="tab-btn" data-tab="loot">LOOT记录</button>
+                </div>
+
+                <div class="tab-content">
+                    <!-- 日志记录标签页 -->
+                    <div class="tab-pane active" id="logsTab">
+                        <div class="panel-header">
+                            <h2>游戏日志</h2>
+                            <button class="btn-primary" id="addLogBtn">
+                                <i class="fas fa-book-medical"></i> 添加日志
+                            </button>
+                        </div>
+
+                        <!-- 日志过滤条件 -->
+                        <div class="filter-container" id="logsFilter" style="display: none;">
+                            <div class="filter-group">
+                                <div class="filter-label">玩家筛选</div>
+                                <input type="text" class="filter-input" id="filterLogPlayer" placeholder="输入玩家名">
+                            </div>
+                            <div class="filter-group">
+                                <div class="filter-label">时间范围</div>
+                                <input type="date" class="filter-input" id="filterLogDate">
+                            </div>
+                            <div class="filter-group">
+                                <div class="filter-label">关键词</div>
+                                <input type="text" class="filter-input" id="filterLogKeyword" placeholder="输入关键词">
+                            </div>
+                            <button class="filter-reset-btn" id="resetLogFilter">
+                                <i class="fas fa-redo"></i> 重置
+                            </button>
+                        </div>
+
+                        <div class="empty-state" id="logsEmpty">
+                            <i class="fas fa-book-open"></i>
+                            <p>暂无游戏日志，点击上方按钮添加日志记录</p>
+                        </div>
+
+                        <div class="data-table-container">
+                            <table class="data-table" id="logsTable" style="display: none;">
+                                <thead>
+                                    <tr>
+                                        <th class="sortable" data-sort="time">时间 <i class="fas fa-sort"></i></th>
+                                        <th class="sortable" data-sort="player">玩家 <i class="fas fa-sort"></i></th>
+                                        <th class="sortable" data-sort="summary">简述 <i class="fas fa-sort"></i></th>
+                                        <th class="sortable" data-sort="details">详述 <i class="fas fa-sort"></i></th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="logsTableBody">
+                                    <!-- 日志数据将在这里动态生成 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Loot记录标签页 -->
+                    <div class="tab-pane" id="lootTab">
+                        <div class="panel-header">
+                            <h2>战利品记录</h2>
+                            <button class="btn-primary" id="addLootBtn">
+                                <i class="fas fa-coins"></i> 添加战利品
+                            </button>
+                        </div>
+
+                        <!-- Loot过滤条件 -->
+                        <div class="filter-container" id="lootFilter" style="display: none;">
+                            <div class="filter-group">
+                                <div class="filter-label">名称筛选</div>
+                                <input type="text" class="filter-input" id="filterLootName" placeholder="输入物品名称">
+                            </div>
+                            <div class="filter-group">
+                                <div class="filter-label">类型筛选</div>
+                                <select class="filter-input select" id="filterLootType">
+                                    <option value="">全部类型</option>
+                                    <option value="金币">金币</option>
+                                    <option value="武器">武器</option>
+                                    <option value="装备">装备</option>
+                                    <option value="奇物">奇物</option>
+                                    <option value="消耗品">消耗品</option>
+                                    <option value="战利品">战利品</option>
+                                    <option value="其他">其他</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <div class="filter-label">状态筛选</div>
+                                <select class="filter-input select" id="filterLootStatus">
+                                    <option value="">全部状态</option>
+                                    <option value="false">未出售</option>
+                                    <option value="true">已出售</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <div class="filter-label">归属人</div>
+                                <input type="text" class="filter-input" id="filterLootOwner" placeholder="输入归属人">
+                            </div>
+                            <button class="filter-reset-btn" id="resetLootFilter">
+                                <i class="fas fa-redo"></i> 重置
+                            </button>
+                        </div>
+
+                        <div class="empty-state" id="lootEmpty">
+                            <i class="fas fa-chest"></i>
+                            <p>暂无战利品记录，点击上方按钮添加战利品</p>
+                        </div>
+
+                        <div class="data-table-container">
+                            <table class="data-table" id="lootTable" style="display: none;">
+                                <thead>
+                                    <tr>
+                                        <th class="sortable" data-sort="createDate">创建时间 <i class="fas fa-sort"></i>
+                                        </th>
+                                        <th class="sortable" data-sort="name">名称 <i class="fas fa-sort"></i></th>
+                                        <th class="sortable" data-sort="quantity">数量 <i class="fas fa-sort"></i></th>
+                                        <th class="sortable" data-sort="price">单价 <i class="fas fa-sort"></i></th>
+                                        <th class="sortable" data-sort="totalPrice">总价 <i class="fas fa-sort"></i></th>
+                                        <th class="sortable" data-sort="type">类型 <i class="fas fa-sort"></i></th>
+                                        <th class="sortable" data-sort="sold">是否出售 <i class="fas fa-sort"></i></th>
+                                        <th class="sortable" data-sort="soldPrice">出售单价 <i class="fas fa-sort"></i></th>
+                                        <th class="sortable" data-sort="soldQuantity">出售数量 <i class="fas fa-sort"></i>
+                                        </th>
+                                        <th class="sortable" data-sort="owner">现归属人 <i class="fas fa-sort"></i></th>
+                                        <th class="sortable" data-sort="acquiredDate">获取日期 <i class="fas fa-sort"></i>
+                                        </th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="lootTableBody">
+                                    <!-- Loot数据将在这里动态生成 -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- 统计信息 -->
+                        <div class="loot-stats-container" id="lootStats" style="display: none;">
+                            <!-- 总价值 - 紧凑展示 -->
+                            <div class="compact-stat-card">
+                                <h4>总计</h4>
+                                <div class="stat-value" id="totalValue">0 gp</div>
+                            </div>
+
+                            <!-- 玩家分配统计 -->
+                            <div id="playersDistributionTable">
+                                <h3><i class="fas fa-users"></i> 玩家分配统计</h3>
+                                <div class="data-table-container">
+                                    <table class="players-distribution-table">
+                                        <thead>
+                                            <tr>
+                                                <th>玩家名</th>
+                                                <th>角色名</th>
+                                                <th>分配总价值</th>
+                                                <th>占比</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="playersDistributionBody">
+                                            <!-- 玩家分配数据将在这里动态生成 -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 跑团信息模态框 -->
+    <div class="modal" id="campaignModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="campaignModalTitle">新建跑团</h3>
+                <button class="close-btn" id="closeCampaignModal">&times;</button>
+            </div>
+            <form id="campaignForm">
+                <input type="hidden" id="campaignId">
+
+                <div class="form-group">
+                    <label for="campaignName">跑团名称 *</label>
+                    <input type="text" id="campaignName" class="form-control" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="campaignGM">主持人 (GM) *</label>
+                        <input type="text" id="campaignGM" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="campaignLocation">开团地址</label>
+                        <input type="text" id="campaignLocation" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="campaignStartDate">开团日期</label>
+                        <input type="date" id="campaignStartDate" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="campaignNextDate">下次开团时间</label>
+                        <input type="datetime-local" id="campaignNextDate" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="campaignDescription">跑团简介</label>
+                    <textarea id="campaignDescription" class="form-control" rows="3"></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelCampaignBtn">取消</button>
+                    <button type="submit" class="btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 玩家信息模态框 -->
+    <div class="modal" id="playerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="playerModalTitle">添加玩家</h3>
+                <button class="close-btn" id="closePlayerModal">&times;</button>
+            </div>
+            <form id="playerForm">
+                <input type="hidden" id="playerId">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="playerName">玩家名 *</label>
+                        <input type="text" id="playerName" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="characterName">角色名 *</label>
+                        <input type="text" id="characterName" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="characterClass">职业和等级</label>
+                        <input type="text" id="characterClass" class="form-control" placeholder="例如：战士 5级">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="playerNumber">编号</label>
+                        <input type="text" id="playerNumber" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="playerFaction">势力</label>
+                        <input type="text" id="playerFaction" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="playerNotes">备注</label>
+                        <input type="text" id="playerNotes" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelPlayerBtn">取消</button>
+                    <button type="submit" class="btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 日志记录模态框 -->
+    <div class="modal" id="logModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="logModalTitle">添加日志</h3>
+                <button class="close-btn" id="closeLogModal">&times;</button>
+            </div>
+            <form id="logForm">
+                <input type="hidden" id="logId">
+
+                <div class="form-group">
+                    <label for="logPlayer">玩家 *</label>
+                    <select id="logPlayer" class="form-control" required>
+                        <option value="">请选择玩家</option>
+                        <!-- 玩家选项将在这里动态生成 -->
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="logTime">时间 *</label>
+                        <input type="datetime-local" id="logTime" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="logSummary">简述 *</label>
+                    <input type="text" id="logSummary" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="logDetails">详述</label>
+                    <textarea id="logDetails" class="form-control" rows="5"></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelLogBtn">取消</button>
+                    <button type="submit" class="btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Loot记录模态框 -->
+    <div class="modal" id="lootModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="lootModalTitle">添加战利品</h3>
+                <button class="close-btn" id="closeLootModal">&times;</button>
+            </div>
+            <form id="lootForm">
+                <input type="hidden" id="lootId">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="lootName">名称 *</label>
+                        <input type="text" id="lootName" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lootQuantity">数量 *</label>
+                        <input type="number" id="lootQuantity" class="form-control" min="1" value="1" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="lootPrice">单价 (gp) *</label>
+                        <input type="number" id="lootPrice" class="form-control" min="0" step="0.01" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lootType">类型</label>
+                        <select id="lootType" class="form-control">
+                            <option value="金币">金币</option>
+                            <option value="武器">武器</option>
+                            <option value="装备">装备</option>
+                            <option value="奇物">奇物</option>
+                            <option value="消耗品">消耗品</option>
+                            <option value="战利品">战利品</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="lootSold">是否出售</label>
+                        <select id="lootSold" class="form-control">
+                            <option value="false">否</option>
+                            <option value="true">是</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lootAcquiredDate">获取日期</label>
+                        <input type="date" id="lootAcquiredDate" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group" id="soldPriceGroup" style="display: none;">
+                        <label for="lootSoldPrice">出售单价 (gp)</label>
+                        <input type="number" id="lootSoldPrice" class="form-control" min="0" step="0.01">
+                    </div>
+
+                    <div class="form-group" id="soldQuantityGroup" style="display: none;">
+                        <label for="lootSoldQuantity">出售数量</label>
+                        <input type="number" id="lootSoldQuantity" class="form-control" min="1">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group" id="ownerGroup">
+                        <label for="lootOwner">现归属人</label>
+                        <select id="lootOwner" class="form-control">
+                            <option value="">未分配</option>
+                            <!-- 玩家选项将在这里动态生成 -->
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelLootBtn">取消</button>
+                    <button type="submit" class="btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 日志详情模态框 -->
+    <div class="detail-modal" id="detailModal">
+        <div class="detail-modal-content">
+            <div class="detail-modal-header">
+                <h3 id="detailModalTitle">日志详情</h3>
+                <button class="detail-close-btn" id="closeDetailModal">&times;</button>
+            </div>
+            <div class="detail-modal-body" id="detailModalBody">
+                <!-- 日志详情内容将在这里动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 分享链接模态框 -->
+    <div class="modal" id="shareModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>分享跑团链接</h3>
+                <button class="close-btn" id="closeShareModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>将以下链接分享给其他人，他们点击链接后将自动跳转到此跑团：</p>
+                <div class="share-link-container">
+                    <span id="shareLinkText"></span>
+                </div>
+                <p class="share-instructions">
+                    <i class="fas fa-info-circle"></i> 提示：直接复制上方链接，或点击下方按钮复制链接"
+                </p>
+                <div class="form-actions">
+                    <button type="button" class="copy-btn" id="copyShareLinkBtn">
+                        <i class="fas fa-copy"></i> 复制链接
+                    </button>
+                    <button type="button" class="btn-secondary" id="cancelShareBtn">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript部分保持不变 -->
+    <script>
+        // 数据存储
+        let campaigns = JSON.parse(localStorage.getItem('trpg_campaigns')) || [];
+        let currentCampaignId = null;
+        let logsSortOrder = { field: 'time', direction: 'desc' };
+        let lootSortOrder = { field: 'createDate', direction: 'desc' };
+        playersSortOrder = { field: 'playerName', direction: 'asc' };
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', async function () {
+            // 从服务器加载数据
+            campaigns = await loadDataFromServer();
+
+            // 加载跑团列表
+            renderCampaignsList();
+
+            // 绑定事件监听器
+            bindEvents();
+
+            // 检查URL hash参数
+            checkUrlHash();
+
+            // 如果存在跑团，默认选中第一个
+            if (campaigns.length > 0 && !currentCampaignId) {
+                // 按创建时间倒序排序，新创建的在上
+                const sortedCampaigns = [...campaigns].sort((a, b) =>
+                    new Date(b.createDate) - new Date(a.createDate)
+                );
+                selectCampaign(sortedCampaigns[0].id);
+            }
+
+            // 初始化排序图标
+            setTimeout(() => {
+                updateSortIcons('playersTable', playersSortOrder);
+                updateSortIcons('logsTable', logsSortOrder);
+                updateSortIcons('lootTable', lootSortOrder);
+            }, 100);
+        });
+
+        // 检查URL hash参数
+        function checkUrlHash() {
+            const hash = window.location.hash;
+            if (hash) {
+                try {
+                    // 去掉#号，解析查询参数
+                    const hashStr = hash.substring(1);
+
+                    // 简单解析name参数
+                    let campaignName = '';
+
+                    // 检查是否包含name参数
+                    if (hashStr.includes('name=')) {
+                        // 提取name参数的值
+                        const nameMatch = hashStr.match(/name=([^&]*)/);
+                        if (nameMatch && nameMatch[1]) {
+                            campaignName = nameMatch[1];
+
+                            // 尝试解码（如果链接是编码的）
+                            try {
+                                campaignName = decodeURIComponent(campaignName);
+                            } catch (e) {
+                                // 解码失败，保持原样（可能是未编码的中文）
+                                console.log('URL参数无需解码或解码失败:', e);
+                            }
+                        }
+                    }
+
+                    if (campaignName) {
+                        // 查找匹配的跑团
+                        const campaign = campaigns.find(c => c.name === campaignName);
+                        if (campaign) {
+                            selectCampaign(campaign.id);
+                            console.log('通过分享链接自动选择跑团:', campaignName);
+                        } else {
+                            console.log('未找到跑团:', campaignName);
+                        }
+                    }
+                } catch (e) {
+                    console.error('解析URL hash时出错:', e);
+                }
+            }
+        }
+
+        // 渲染跑团列表
+        function renderCampaignsList() {
+            const campaignsList = document.getElementById('campaignsList');
+
+            if (campaigns.length === 0) {
+                campaignsList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-dice-d20"></i>
+                        <p>暂无跑团记录，点击上方按钮创建第一个跑团</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // 按创建时间倒序排序，新创建的在上
+            const sortedCampaigns = [...campaigns].sort((a, b) =>
+                new Date(b.createDate) - new Date(a.createDate)
+            );
+
+            let html = '';
+
+            sortedCampaigns.forEach(campaign => {
+                const nextDate = campaign.nextDate ? new Date(campaign.nextDate).toLocaleString() : '未设置';
+                const isActive = currentCampaignId === campaign.id ? 'active' : '';
+
+                html += `
+                    <div class="campaign-item ${isActive}" data-id="${campaign.id}">
+                        <div class="campaign-name">${campaign.name}</div>
+                        <div class="campaign-gm">GM: ${campaign.gm}</div>
+                        <div class="campaign-next-date">
+                            <i class="far fa-calendar-alt"></i>
+                            下次开团: ${nextDate}
+                        </div>
+                        <div class="campaign-actions">
+                            <button class="btn-icon edit-campaign" data-id="${campaign.id}" title="编辑">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-icon delete-campaign" data-id="${campaign.id}" title="删除">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            campaignsList.innerHTML = html;
+
+            // 绑定跑团项目点击事件
+            document.querySelectorAll('.campaign-item').forEach(item => {
+                item.addEventListener('click', function (e) {
+                    if (!e.target.closest('.campaign-actions')) {
+                        const id = this.getAttribute('data-id');
+                        selectCampaign(id);
+                    }
+                });
+            });
+
+            // 绑定编辑和删除按钮事件
+            document.querySelectorAll('.edit-campaign').forEach(btn => {
+                btn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    const id = this.getAttribute('data-id');
+                    openCampaignModal(id);
+                });
+            });
+
+            document.querySelectorAll('.delete-campaign').forEach(btn => {
+                btn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    const id = this.getAttribute('data-id');
+                    deleteCampaign(id);
+                });
+            });
+        }
+
+        // 选择跑团
+        function selectCampaign(id) {
+            currentCampaignId = id;
+            const campaign = campaigns.find(c => c.id === id);
+
+            if (!campaign) return;
+
+            // 更新左侧列表的选中状态
+            document.querySelectorAll('.campaign-item').forEach(item => {
+                if (item.getAttribute('data-id') === id) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+
+            // 显示跑团详情
+            renderCampaignDetails(campaign);
+
+            // 显示玩家列表和标签页
+            document.getElementById('playersSection').style.display = 'block';
+            document.getElementById('detailTabs').style.display = 'flex';
+
+            // 加载该跑团的相关数据
+            renderPlayersList();
+            renderLogsList();
+            renderLootList();
+            updateLootStats();
+        }
+
+        // 渲染跑团详情
+        function renderCampaignDetails(campaign) {
+            const detailsContainer = document.getElementById('campaignDetails');
+
+            const startDate = campaign.startDate ? new Date(campaign.startDate).toLocaleDateString() : '未设置';
+            const nextDate = campaign.nextDate ? new Date(campaign.nextDate).toLocaleString() : '未设置';
+
+            detailsContainer.innerHTML = `
+                <div class="campaign-header">
+                    <h2>${campaign.name}</h2>
+                    <button class="share-btn" id="shareCampaignBtn" title="分享跑团链接">
+                        <i class="fas fa-share-alt"></i> 分享跑团
+                    </button>
+                </div>
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">主持人 (GM)</div>
+                        <div class="detail-value">${campaign.gm}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">下次开团时间</div>
+                        <div class="detail-value">${nextDate}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">开团地址</div>
+                        <div class="detail-value">${campaign.location || '未设置'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">开团日期</div>
+                        <div class="detail-value">${startDate}</div>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">简介</div>
+                    <div class="detail-value">${campaign.description || '暂无简介'}</div>
+                </div>
+            `;
+
+            // 绑定分享按钮事件
+            const shareBtn = document.getElementById('shareCampaignBtn');
+            if (shareBtn) {
+                shareBtn.addEventListener('click', () => {
+                    showShareModal(campaign);
+                });
+            }
+        }
+
+        // 显示分享链接模态框
+        function showShareModal(campaign) {
+            if (!campaign || !campaign.name) {
+                alert('无法生成分享链接');
+                return;
+            }
+
+            // 这里我们选择使用未编码的中文，因为现代浏览器都支持
+            const shareUrl = `http://39.106.239.169/跑团记录/跑团记录.html#name=${campaign.name}`;
+
+            // 显示在模态框中
+            const shareLinkText = document.getElementById('shareLinkText');
+            shareLinkText.innerHTML = `
+                <a href="${shareUrl}" class="share-link" target="_blank">${shareUrl}</a>
+            `;
+
+            // 打开模态框
+            const shareModal = document.getElementById('shareModal');
+            shareModal.classList.add('active');
+
+            // 在控制台输出分享链接
+            console.log('分享链接:', shareUrl);
+
+            // 重置复制按钮状态
+            const copyBtn = document.getElementById('copyShareLinkBtn');
+            copyBtn.innerHTML = '<i class="fas fa-copy"></i> 复制链接';
+            copyBtn.classList.remove('copied');
+            copyBtn.disabled = false;
+
+            // 绑定复制按钮事件
+            copyBtn.onclick = function () {
+                copyToClipboard(shareUrl);
+
+                // 更新按钮状态
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> 已复制';
+                copyBtn.classList.add('copied');
+                copyBtn.disabled = true;
+
+                // 3秒后恢复按钮状态
+                setTimeout(() => {
+                    copyBtn.innerHTML = '<i class="fas fa-copy"></i> 复制链接';
+                    copyBtn.classList.remove('copied');
+                    copyBtn.disabled = false;
+                }, 3000);
+            };
+        }
+
+        // 添加复制到剪贴板的函数
+        function copyToClipboard(text) {
+            // 创建一个临时textarea元素
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+
+            // 选择文本并复制
+            textarea.select();
+            textarea.setSelectionRange(0, 99999); // 为了移动设备
+
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    console.log('链接已复制到剪贴板');
+                } else {
+                    throw new Error('复制失败');
+                }
+            } catch (err) {
+                console.error('复制失败:', err);
+
+                // 尝试使用Clipboard API（现代浏览器）
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        console.log('链接已复制到剪贴板（使用Clipboard API）');
+                    }).catch(err => {
+                        console.error('Clipboard API复制失败:', err);
+                        alert('复制失败，请手动复制链接');
+                    });
+                } else {
+                    alert('复制失败，请手动复制链接');
+                }
+            }
+
+            // 移除临时元素
+            document.body.removeChild(textarea);
+        }
+
+        // 渲染玩家列表
+        function renderPlayersList() {
+            const campaign = campaigns.find(c => c.id === currentCampaignId);
+            if (!campaign) return;
+
+            const players = campaign.players || [];
+            const playersTable = document.getElementById('playersTable');
+            const playersTableBody = document.getElementById('playersTableBody');
+            const playersEmpty = document.getElementById('playersEmpty');
+
+            if (players.length === 0) {
+                playersTable.style.display = 'none';
+                playersEmpty.style.display = 'block';
+                return;
+            }
+
+            playersTable.style.display = 'table';
+            playersEmpty.style.display = 'none';
+
+            // 排序玩家列表
+            const sortedPlayers = sortPlayers(players, playersSortOrder);
+
+            let html = '';
+
+            sortedPlayers.forEach((player, index) => {
+                html += `
+                    <tr data-id="${player.id}">
+                        <td>${player.playerName}</td>
+                        <td>${player.characterName}</td>
+                        <td>${player.characterClass || '-'}</td>
+                        <td>${player.number || '-'}</td>
+                        <td>${player.faction || '-'}</td>
+                        <td>${player.notes || '-'}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-icon edit-player" data-id="${player.id}" title="编辑">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-icon delete-player" data-id="${player.id}" title="删除">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            playersTableBody.innerHTML = html;
+
+            // 绑定玩家操作按钮事件
+            bindPlayerActions();
+
+            // 绑定排序表头点击事件
+            bindSortHeaders('players');
+
+            // 在渲染完成后更新排序图标
+            setTimeout(() => {
+                updateSortIcons('playersTable', playersSortOrder);
+            }, 0);
+        }
+
+        // 渲染日志列表
+        function renderLogsList() {
+            const campaign = campaigns.find(c => c.id === currentCampaignId);
+            if (!campaign) return;
+
+            const logs = campaign.logs || [];
+            const logsTable = document.getElementById('logsTable');
+            const logsTableBody = document.getElementById('logsTableBody');
+            const logsEmpty = document.getElementById('logsEmpty');
+            const logsFilter = document.getElementById('logsFilter');
+
+            // 总是显示筛选条件
+            logsFilter.style.display = 'flex';
+
+            // 应用过滤条件
+            const filteredLogs = filterLogs(logs);
+
+            if (filteredLogs.length === 0) {
+                logsTable.style.display = 'none';
+                logsEmpty.style.display = 'block';
+                return;
+            }
+
+            logsTable.style.display = 'table';
+            logsEmpty.style.display = 'none';
+
+            // 排序日志列表
+            const sortedLogs = sortLogs(filteredLogs, logsSortOrder);
+
+            let html = '';
+
+            sortedLogs.forEach((log, index) => {
+                const time = new Date(log.time).toLocaleString();
+                const summary = log.summary.length > 50 ? log.summary.substring(0, 50) + '...' : log.summary;
+                const details = log.details && log.details.length > 80 ? log.details.substring(0, 80) + '...' : log.details || '点击查看详情';
+
+                html += `
+                    <tr data-id="${log.id}">
+                        <td>${time}</td>
+                        <td>${log.player}</td>
+                        <td class="log-summary-cell" title="${log.summary}">${summary}</td>
+                        <td class="log-details-cell" data-id="${log.id}">
+                            ${details}
+                            <span class="view-more">查看更多</span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-icon edit-log" data-id="${log.id}" title="编辑">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-icon delete-log" data-id="${log.id}" title="删除">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            logsTableBody.innerHTML = html;
+
+            // 绑定日志操作按钮事件
+            bindLogActions();
+
+            // 绑定排序表头点击事件
+            bindSortHeaders('logs');
+
+            // 绑定详情单元格点击事件
+            document.querySelectorAll('.log-details-cell').forEach(cell => {
+                cell.addEventListener('click', function (e) {
+                    // 如果点击的是编辑或删除按钮，不触发详情查看
+                    if (e.target.closest('.btn-icon')) {
+                        return;
+                    }
+
+                    const logId = this.getAttribute('data-id');
+                    const log = sortedLogs.find(l => l.id === logId);
+                    if (log) {
+                        showLogDetail(log);
+                    }
+                });
+            });
+
+            // 在渲染完成后更新排序图标
+            setTimeout(() => {
+                updateSortIcons('logsTable', logsSortOrder);
+            }, 0);
+        }
+
+        // 渲染Loot列表
+        function renderLootList() {
+            const campaign = campaigns.find(c => c.id === currentCampaignId);
+            if (!campaign) return;
+
+            const loots = campaign.loot || [];
+            const lootTable = document.getElementById('lootTable');
+            const lootTableBody = document.getElementById('lootTableBody');
+            const lootEmpty = document.getElementById('lootEmpty');
+            const lootFilter = document.getElementById('lootFilter');
+            const lootStats = document.getElementById('lootStats');
+
+            // 总是显示筛选条件
+            lootFilter.style.display = 'flex';
+
+            // 应用过滤条件
+            const filteredLoots = filterLoots(loots);
+
+            if (filteredLoots.length === 0) {
+                lootTable.style.display = 'none';
+                lootStats.style.display = 'none';
+                lootEmpty.style.display = 'block';
+                return;
+            }
+
+            lootTable.style.display = 'table';
+            lootStats.style.display = 'flex';
+            lootEmpty.style.display = 'none';
+
+            // 排序Loot列表
+            const sortedLoots = sortLoots(filteredLoots, lootSortOrder);
+
+            let html = '';
+
+            sortedLoots.forEach((loot, index) => {
+                const totalPrice = (loot.price * loot.quantity).toFixed(2);
+                const status = loot.sold === 'true' ? `<span style="color: #4CAF50;">已出售</span>` : '<span style="color: #FF9800;">未出售</span>';
+                const soldPrice = loot.sold === 'true' && loot.soldPrice ? `${parseFloat(loot.soldPrice).toFixed(2)} gp` : '-';
+                const soldQuantity = loot.sold === 'true' && loot.soldQuantity ? loot.soldQuantity : '-';
+                const owner = loot.sold === 'true' ? '-' : (loot.owner || '未分配');
+                const acquiredDate = loot.acquiredDate ? new Date(loot.acquiredDate).toLocaleDateString() : '-';
+                const createDate = loot.createDate ? new Date(loot.createDate).toLocaleString() : '-';
+
+                html += `
+                    <tr data-id="${loot.id}">
+                        <td>${createDate}</td>
+                        <td>${loot.name}</td>
+                        <td>${loot.quantity}</td>
+                        <td>${parseFloat(loot.price).toFixed(2)} gp</td>
+                        <td>${totalPrice} gp</td>
+                        <td>${loot.type}</td>
+                        <td>${status}</td>
+                        <td>${soldPrice}</td>
+                        <td>${soldQuantity}</td>
+                        <td>${owner}</td>
+                        <td>${acquiredDate}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-icon edit-loot" data-id="${loot.id}" title="编辑">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-icon delete-loot" data-id="${loot.id}" title="删除">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            lootTableBody.innerHTML = html;
+
+            // 绑定Loot操作按钮事件
+            bindLootActions();
+
+            // 绑定排序表头点击事件
+            bindSortHeaders('loot');
+
+            // 在渲染完成后更新排序图标
+            setTimeout(() => {
+                updateSortIcons('lootTable', lootSortOrder);
+            }, 0);
+        }
+
+        // 更新Loot统计信息
+        function updateLootStats() {
+            const campaign = campaigns.find(c => c.id === currentCampaignId);
+            if (!campaign) return;
+
+            const loots = campaign.loot || [];
+            const players = campaign.players || [];
+
+            let totalValue = 0;
+            let unsoldValue = 0;
+
+            // 初始化玩家分配价值
+            const playerDistribution = {};
+            players.forEach(player => {
+                playerDistribution[player.playerName] = {
+                    playerName: player.playerName,
+                    characterName: player.characterName,
+                    totalValue: 0,
+                    percentage: 0
+                };
+            });
+
+            // 添加"未分配"选项
+            playerDistribution['未分配'] = {
+                playerName: '未分配',
+                characterName: '-',
+                totalValue: 0,
+                percentage: 0
+            };
+
+            // 计算总价值和玩家分配价值
+            loots.forEach(loot => {
+                const itemValue = loot.price * loot.quantity;
+                totalValue += itemValue;
+
+                // 如果未出售，则计入未出售总价值
+                if (loot.sold === 'false') {
+                    unsoldValue += itemValue;
+                }
+
+                // 如果未出售且有归属人，则计入该玩家的分配价值
+                if (loot.sold === 'false' && loot.owner) {
+                    if (playerDistribution[loot.owner]) {
+                        playerDistribution[loot.owner].totalValue += itemValue;
+                    } else {
+                        // 如果归属人不在当前玩家列表中，添加到未分配
+                        playerDistribution['未分配'].totalValue += itemValue;
+                    }
+                } else if (loot.sold === 'false' && !loot.owner) {
+                    // 如果未出售且无归属人，计入未分配
+                    playerDistribution['未分配'].totalValue += itemValue;
+                }
+            });
+
+            // 更新总价值显示
+            const totalValueElement = document.getElementById('totalValue');
+            if (unsoldValue > 0 && unsoldValue !== totalValue) {
+                totalValueElement.innerHTML = `
+                    <span style="font-size: 0.9rem; color: #4fc3f7;">总价值：</span><span style="font-size: 0.9rem; color: #ff8a00;">${totalValue.toFixed(2)} gp</span>
+                    <br>
+                    <span style="font-size: 0.9rem; color: #4fc3f7;">未出售：</span><span style="font-size: 0.9rem; color: #ff8a00;">${unsoldValue.toFixed(2)} gp</span>`;
+            } else {
+                totalValueElement.textContent = totalValue.toFixed(2) + ' gp';
+            }
+
+            // 显示或隐藏玩家分配统计表
+            const playersDistributionTable = document.getElementById('playersDistributionTable');
+            const playersDistributionBody = document.getElementById('playersDistributionBody');
+
+            // 检查是否有分配记录（排除未分配且值为0的情况）
+            let hasDistribution = false;
+            Object.values(playerDistribution).forEach(player => {
+                if (player.totalValue > 0 && player.playerName !== '未分配') {
+                    hasDistribution = true;
+                }
+            });
+
+            // 如果有未分配的物品，也显示
+            if (playerDistribution['未分配'].totalValue > 0) {
+                hasDistribution = true;
+            }
+
+            if (hasDistribution) {
+                playersDistributionTable.style.display = 'block';
+
+                // 计算每个玩家的占比（避免除以零）
+                Object.values(playerDistribution).forEach(player => {
+                    if (unsoldValue > 0) {
+                        player.percentage = ((player.totalValue / unsoldValue) * 100).toFixed(1);
+                    } else {
+                        player.percentage = '0.0';
+                    }
+                });
+
+                // 生成玩家分配表格（按价值从高到低排序）
+                let html = '';
+                const sortedPlayers = Object.values(playerDistribution)
+                    .filter(player => player.totalValue > 0)
+                    .sort((a, b) => b.totalValue - a.totalValue);
+
+                sortedPlayers.forEach(player => {
+                    html += `
+                <tr>
+                    <td>${player.playerName}</td>
+                    <td>${player.characterName || '-'}</td>
+                    <td>${player.totalValue.toFixed(2)} gp</td>
+                    <td>${player.percentage}%</td>
+                </tr>
+            `;
+                });
+
+                // 如果没有分配记录，显示提示
+                if (sortedPlayers.length === 0) {
+                    html = `
+                <tr>
+                    <td colspan="4" style="text-align: center; color: rgba(255, 255, 255, 0.5);">
+                        暂无分配记录
+                    </td>
+                </tr>
+            `;
+                }
+
+                playersDistributionBody.innerHTML = html;
+            } else {
+                playersDistributionTable.style.display = 'none';
+                playersDistributionBody.innerHTML = '';
+            }
+        }
+
+        // 过滤日志
+        function filterLogs(logs) {
+            const playerFilter = document.getElementById('filterLogPlayer').value.toLowerCase();
+            const dateFilter = document.getElementById('filterLogDate').value;
+            const keywordFilter = document.getElementById('filterLogKeyword').value.toLowerCase();
+
+            return logs.filter(log => {
+                // 玩家筛选
+                if (playerFilter && !log.player.toLowerCase().includes(playerFilter)) {
+                    return false;
+                }
+
+                // 日期筛选
+                if (dateFilter) {
+                    const logDate = new Date(log.time).toISOString().split('T')[0];
+                    if (logDate !== dateFilter) {
+                        return false;
+                    }
+                }
+
+                // 关键词筛选
+                if (keywordFilter) {
+                    const summary = log.summary.toLowerCase();
+                    const details = log.details ? log.details.toLowerCase() : '';
+                    if (!summary.includes(keywordFilter) && !details.includes(keywordFilter)) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+        }
+
+        // 过滤战利品
+        function filterLoots(loots) {
+            const nameFilter = document.getElementById('filterLootName').value.toLowerCase();
+            const typeFilter = document.getElementById('filterLootType').value;
+            const statusFilter = document.getElementById('filterLootStatus').value;
+            const ownerFilter = document.getElementById('filterLootOwner').value.toLowerCase();
+
+            return loots.filter(loot => {
+                // 名称筛选
+                if (nameFilter && !loot.name.toLowerCase().includes(nameFilter)) {
+                    return false;
+                }
+
+                // 类型筛选
+                if (typeFilter && loot.type !== typeFilter) {
+                    return false;
+                }
+
+                // 状态筛选
+                if (statusFilter && loot.sold !== statusFilter) {
+                    return false;
+                }
+
+                // 归属人筛选
+                if (ownerFilter) {
+                    const owner = loot.owner || '';
+                    if (!owner.toLowerCase().includes(ownerFilter)) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+        }
+
+        // 排序日志
+        function sortLogs(logs, sortOrder) {
+            const sorted = [...logs];
+
+            sorted.sort((a, b) => {
+                let aValue, bValue;
+
+                switch (sortOrder.field) {
+                    case 'time':
+                        aValue = new Date(a.time).getTime();
+                        bValue = new Date(b.time).getTime();
+                        break;
+                    case 'player':
+                        aValue = a.player.toLowerCase();
+                        bValue = b.player.toLowerCase();
+                        break;
+                    case 'summary':
+                        aValue = a.summary.toLowerCase();
+                        bValue = b.summary.toLowerCase();
+                        break;
+                    case 'details':
+                        aValue = (a.details || '').toLowerCase();
+                        bValue = (b.details || '').toLowerCase();
+                        break;
+                    default:
+                        return 0;
+                }
+
+                if (aValue < bValue) {
+                    return sortOrder.direction === 'asc' ? -1 : 1;
+                }
+                if (aValue > bValue) {
+                    return sortOrder.direction === 'asc' ? 1 : -1;
+                }
+                return 0;
+            });
+
+            return sorted;
+        }
+
+        // 排序战利品
+        function sortLoots(loots, sortOrder) {
+            const sorted = [...loots];
+
+            sorted.sort((a, b) => {
+                let aValue, bValue;
+
+                switch (sortOrder.field) {
+                    case 'createDate':
+                        aValue = new Date(a.createDate || 0).getTime();
+                        bValue = new Date(b.createDate || 0).getTime();
+                        break;
+                    case 'name':
+                        aValue = a.name.toLowerCase();
+                        bValue = b.name.toLowerCase();
+                        break;
+                    case 'quantity':
+                        aValue = a.quantity;
+                        bValue = b.quantity;
+                        break;
+                    case 'price':
+                        aValue = a.price;
+                        bValue = b.price;
+                        break;
+                    case 'totalPrice':
+                        aValue = a.price * a.quantity;
+                        bValue = b.price * b.quantity;
+                        break;
+                    case 'type':
+                        aValue = a.type.toLowerCase();
+                        bValue = b.type.toLowerCase();
+                        break;
+                    case 'sold':
+                        aValue = a.sold === 'true' ? 1 : 0;
+                        bValue = b.sold === 'true' ? 1 : 0;
+                        break;
+                    case 'soldPrice':
+                        aValue = a.soldPrice || 0;
+                        bValue = b.soldPrice || 0;
+                        break;
+                    case 'soldQuantity':
+                        aValue = a.soldQuantity || 0;
+                        bValue = b.soldQuantity || 0;
+                        break;
+                    case 'owner':
+                        aValue = (a.owner || '').toLowerCase();
+                        bValue = (b.owner || '').toLowerCase();
+                        break;
+                    case 'acquiredDate':
+                        aValue = new Date(a.acquiredDate || 0).getTime();
+                        bValue = new Date(b.acquiredDate || 0).getTime();
+                        break;
+                    default:
+                        return 0;
+                }
+
+                if (aValue < bValue) {
+                    return sortOrder.direction === 'asc' ? -1 : 1;
+                }
+                if (aValue > bValue) {
+                    return sortOrder.direction === 'asc' ? 1 : -1;
+                }
+                return 0;
+            });
+
+            return sorted;
+        }
+
+        // 排序玩家
+        function sortPlayers(players, sortOrder) {
+            const sorted = [...players];
+
+            sorted.sort((a, b) => {
+                let aValue, bValue;
+
+                switch (sortOrder.field) {
+                    case 'playerName':
+                        aValue = a.playerName.toLowerCase();
+                        bValue = b.playerName.toLowerCase();
+                        break;
+                    case 'characterName':
+                        aValue = a.characterName.toLowerCase();
+                        bValue = b.characterName.toLowerCase();
+                        break;
+                    case 'characterClass':
+                        aValue = (a.characterClass || '').toLowerCase();
+                        bValue = (b.characterClass || '').toLowerCase();
+                        break;
+                    case 'number':
+                        aValue = (a.number || '').toLowerCase();
+                        bValue = (b.number || '').toLowerCase();
+                        break;
+                    case 'faction':
+                        aValue = (a.faction || '').toLowerCase();
+                        bValue = (b.faction || '').toLowerCase();
+                        break;
+                    case 'notes':
+                        aValue = (a.notes || '').toLowerCase();
+                        bValue = (b.notes || '').toLowerCase();
+                        break;
+                    default:
+                        return 0;
+                }
+
+                if (aValue < bValue) {
+                    return sortOrder.direction === 'asc' ? -1 : 1;
+                }
+                if (aValue > bValue) {
+                    return sortOrder.direction === 'asc' ? 1 : -1;
+                }
+                return 0;
+            });
+
+            return sorted;
+        }
+
+        // 绑定事件监听器
+        function bindEvents() {
+            // 标签页切换
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const tabId = this.getAttribute('data-tab');
+
+                    // 更新标签按钮状态
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // 显示对应的标签内容
+                    document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+                    document.getElementById(tabId + 'Tab').classList.add('active');
+                });
+            });
+
+            // 跑团相关按钮
+            document.getElementById('addCampaignBtn').addEventListener('click', () => openCampaignModal());
+            document.getElementById('closeCampaignModal').addEventListener('click', closeCampaignModal);
+            document.getElementById('cancelCampaignBtn').addEventListener('click', closeCampaignModal);
+            document.getElementById('campaignForm').addEventListener('submit', saveCampaign);
+
+            // 日期输入自动切换
+            document.getElementById('campaignStartDate').addEventListener('input', handleDateInput);
+
+            // 玩家相关按钮
+            document.getElementById('addPlayerBtn').addEventListener('click', () => openPlayerModal());
+            document.getElementById('closePlayerModal').addEventListener('click', closePlayerModal);
+            document.getElementById('cancelPlayerBtn').addEventListener('click', closePlayerModal);
+            document.getElementById('playerForm').addEventListener('submit', savePlayer);
+
+            // 日志相关按钮
+            document.getElementById('addLogBtn').addEventListener('click', () => openLogModal());
+            document.getElementById('closeLogModal').addEventListener('click', closeLogModal);
+            document.getElementById('cancelLogBtn').addEventListener('click', closeLogModal);
+            document.getElementById('logForm').addEventListener('submit', saveLog);
+
+            // 日志过滤条件
+            document.getElementById('filterLogPlayer').addEventListener('input', () => renderLogsList());
+            document.getElementById('filterLogDate').addEventListener('change', () => renderLogsList());
+            document.getElementById('filterLogKeyword').addEventListener('input', () => renderLogsList());
+
+            // 日志重置按钮
+            document.getElementById('resetLogFilter').addEventListener('click', () => {
+                document.getElementById('filterLogPlayer').value = '';
+                document.getElementById('filterLogDate').value = '';
+                document.getElementById('filterLogKeyword').value = '';
+                renderLogsList();
+            });
+
+            // Loot相关按钮
+            document.getElementById('addLootBtn').addEventListener('click', () => openLootModal());
+            document.getElementById('closeLootModal').addEventListener('click', closeLootModal);
+            document.getElementById('cancelLootBtn').addEventListener('click', closeLootModal);
+            document.getElementById('lootForm').addEventListener('submit', saveLoot);
+
+            // Loot过滤条件
+            document.getElementById('filterLootName').addEventListener('input', () => renderLootList());
+            document.getElementById('filterLootType').addEventListener('change', () => renderLootList());
+            document.getElementById('filterLootStatus').addEventListener('change', () => renderLootList());
+            document.getElementById('filterLootOwner').addEventListener('input', () => renderLootList());
+
+            // Loot重置按钮
+            document.getElementById('resetLootFilter').addEventListener('click', () => {
+                document.getElementById('filterLootName').value = '';
+                document.getElementById('filterLootType').value = '';
+                document.getElementById('filterLootStatus').value = '';
+                document.getElementById('filterLootOwner').value = '';
+                renderLootList();
+            });
+
+            // Loot出售状态切换
+            document.getElementById('lootSold').addEventListener('change', function () {
+                const sold = this.value === 'true';
+                const soldPriceGroup = document.getElementById('soldPriceGroup');
+                const soldQuantityGroup = document.getElementById('soldQuantityGroup');
+                const ownerGroup = document.getElementById('ownerGroup');
+
+                if (sold) {
+                    soldPriceGroup.style.display = 'block';
+                    soldQuantityGroup.style.display = 'block';
+                    ownerGroup.style.display = 'none';
+                } else {
+                    soldPriceGroup.style.display = 'none';
+                    soldQuantityGroup.style.display = 'none';
+                    ownerGroup.style.display = 'block';
+                }
+            });
+
+            // 模态框外部点击关闭
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', function (e) {
+                    if (e.target === this) {
+                        this.classList.remove('active');
+                    }
+                });
+            });
+
+            // 详情模态框关闭
+            const closeDetailModalBtn = document.getElementById('closeDetailModal');
+            if (closeDetailModalBtn) {
+                closeDetailModalBtn.addEventListener('click', () => {
+                    const detailModal = document.getElementById('detailModal');
+                    if (detailModal) {
+                        detailModal.classList.remove('active');
+                    }
+                });
+            }
+
+            // 分享模态框关闭按钮
+            document.getElementById('closeShareModal').addEventListener('click', () => {
+                document.getElementById('shareModal').classList.remove('active');
+            });
+
+            document.getElementById('cancelShareBtn').addEventListener('click', () => {
+                document.getElementById('shareModal').classList.remove('active');
+            });
+
+            window.addEventListener('hashchange', function () {
+                checkUrlHash();
+            });
+        }
+
+        // 绑定排序表头点击事件
+        function bindSortHeaders(tableType) {
+            const tableId = tableType === 'logs' ? 'logsTable' :
+                tableType === 'loot' ? 'lootTable' : 'playersTable';
+
+            // 先移除之前的事件监听器
+            const table = document.getElementById(tableId);
+            if (!table) return;
+
+            // 获取所有可排序的表头
+            const sortableHeaders = table.querySelectorAll('th.sortable');
+
+            // 移除之前的事件监听器
+            sortableHeaders.forEach(th => {
+                // 克隆元素以移除所有事件监听器
+                const newTh = th.cloneNode(true);
+                th.parentNode.replaceChild(newTh, th);
+            });
+
+            // 重新绑定事件
+            document.querySelectorAll(`#${tableId} th.sortable`).forEach(th => {
+                th.addEventListener('click', function () {
+                    const field = this.getAttribute('data-sort');
+                    const sortOrder = tableType === 'logs' ? logsSortOrder :
+                        tableType === 'loot' ? lootSortOrder : playersSortOrder;
+
+                    // 切换排序方向
+                    if (sortOrder.field === field) {
+                        sortOrder.direction = sortOrder.direction === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        sortOrder.field = field;
+                        sortOrder.direction = 'asc';
+                    }
+
+                    // 更新排序图标
+                    updateSortIcons(tableId, sortOrder);
+
+                    // 更新UI
+                    if (tableType === 'logs') {
+                        renderLogsList();
+                    } else if (tableType === 'loot') {
+                        renderLootList();
+                    } else {
+                        renderPlayersList();
+                    }
+                });
+            });
+        }
+
+        // 更新排序图标
+        function updateSortIcons(tableId, sortOrder) {
+            const table = document.getElementById(tableId);
+            if (!table) return;
+
+            // 移除所有排序图标
+            table.querySelectorAll('th.sortable i').forEach(icon => {
+                icon.className = 'fas fa-sort';
+            });
+
+            // 为当前排序字段添加正确的图标
+            const currentSortHeader = table.querySelector(`th.sortable[data-sort="${sortOrder.field}"]`);
+            if (currentSortHeader) {
+                const icon = currentSortHeader.querySelector('i');
+                if (icon) {
+                    icon.className = sortOrder.direction === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down';
+                }
+            }
+        }
+
+        // 绑定玩家操作按钮事件
+        function bindPlayerActions() {
+            document.querySelectorAll('.edit-player').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const id = this.getAttribute('data-id');
+                    openPlayerModal(id);
+                });
+            });
+
+            document.querySelectorAll('.delete-player').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const id = this.getAttribute('data-id');
+                    deletePlayer(id);
+                });
+            });
+        }
+
+        // 绑定日志操作按钮事件
+        function bindLogActions() {
+            document.querySelectorAll('.edit-log').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const id = this.getAttribute('data-id');
+                    openLogModal(id);
+                });
+            });
+
+            document.querySelectorAll('.delete-log').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const id = this.getAttribute('data-id');
+                    deleteLog(id);
+                });
+            });
+        }
+
+        // 绑定Loot操作按钮事件
+        function bindLootActions() {
+            document.querySelectorAll('.edit-loot').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const id = this.getAttribute('data-id');
+                    openLootModal(id);
+                });
+            });
+
+            document.querySelectorAll('.delete-loot').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const id = this.getAttribute('data-id');
+                    deleteLoot(id);
+                });
+            });
+        }
+
+        // 跑团模态框
+        function openCampaignModal(id = null) {
+            const modal = document.getElementById('campaignModal');
+            const title = document.getElementById('campaignModalTitle');
+            const form = document.getElementById('campaignForm');
+
+            if (id) {
+                // 编辑模式
+                const campaign = campaigns.find(c => c.id === id);
+                if (!campaign) return;
+
+                title.textContent = '编辑跑团';
+                document.getElementById('campaignId').value = campaign.id;
+                document.getElementById('campaignName').value = campaign.name;
+                document.getElementById('campaignDescription').value = campaign.description || '';
+                document.getElementById('campaignGM').value = campaign.gm;
+                document.getElementById('campaignStartDate').value = campaign.startDate ? formatDateForInput(campaign.startDate) : '';
+                document.getElementById('campaignLocation').value = campaign.location || '';
+                document.getElementById('campaignNextDate').value = campaign.nextDate ? formatDateTimeForInput(campaign.nextDate) : '';
+            } else {
+                // 新建模式
+                title.textContent = '新建跑团';
+                form.reset();
+                document.getElementById('campaignId').value = '';
+                // 设置默认时间为当前时间（东八区）
+                document.getElementById('campaignNextDate').value = getLocalDateTime();
+            }
+
+            modal.classList.add('active');
+        }
+
+        // 日期输入自动切换
+        function handleDateInput(e) {
+            const input = e.target;
+            const value = input.value;
+
+            // 当年份输入4位时自动切换到月份
+            if (value.length === 4 && /^\d{4}$/.test(value)) {
+                // 自动添加分隔符并聚焦到月份部分
+                input.value = value + '-';
+                // 这里不能直接设置selection，需要延迟一下
+                setTimeout(() => {
+                    input.focus();
+                    input.setSelectionRange(5, 5);
+                }, 10);
+            }
+        }
+
+        // 获取本地日期时间（东八区）
+        function getLocalDateTime() {
+            const now = new Date();
+            // 转换为东八区时间
+            const localTime = new Date(now.getTime() + (8 * 60 * 60 * 1000));
+            return localTime.toISOString().slice(0, 16);
+        }
+
+        // 格式化日期为输入框格式
+        function formatDateForInput(dateString) {
+            if (!dateString) return '';
+            try {
+                const date = new Date(dateString);
+                // 转换为东八区时间
+                const localDate = new Date(date.getTime() + (8 * 60 * 60 * 1000));
+                return localDate.toISOString().slice(0, 10);
+            } catch (e) {
+                console.error('日期格式化错误:', e);
+                return '';
+            }
+        }
+
+        // 格式化日期时间为输入框格式
+        function formatDateTimeForInput(dateTimeString) {
+            if (!dateTimeString) return '';
+            try {
+                const date = new Date(dateTimeString);
+                // 转换为东八区时间
+                const localDate = new Date(date.getTime() + (8 * 60 * 60 * 1000));
+                return localDate.toISOString().slice(0, 16);
+            } catch (e) {
+                console.error('日期时间格式化错误:', e);
+                return '';
+            }
+        }
+
+        function closeCampaignModal() {
+            document.getElementById('campaignModal').classList.remove('active');
+        }
+
+        // 保存跑团
+        async function saveCampaign(e) {
+            e.preventDefault();
+
+            const id = document.getElementById('campaignId').value;
+            const name = document.getElementById('campaignName').value.trim();
+            const description = document.getElementById('campaignDescription').value.trim();
+            const gm = document.getElementById('campaignGM').value.trim();
+            const startDate = document.getElementById('campaignStartDate').value;
+            const location = document.getElementById('campaignLocation').value.trim();
+            const nextDate = document.getElementById('campaignNextDate').value;
+
+            if (!name || !gm) {
+                alert('请填写必填字段');
+                return;
+            }
+
+            if (id) {
+                // 更新现有跑团
+                const index = campaigns.findIndex(c => c.id === id);
+                if (index !== -1) {
+                    campaigns[index] = {
+                        ...campaigns[index],
+                        name,
+                        description,
+                        gm,
+                        startDate: startDate || null,
+                        location,
+                        nextDate: nextDate || null
+                    };
+                }
+            } else {
+                // 创建新跑团
+                const newCampaign = {
+                    id: generateId(),
+                    name,
+                    description,
+                    gm,
+                    startDate: startDate || null,
+                    location,
+                    nextDate: nextDate || null,
+                    createDate: new Date().toISOString(),
+                    players: [],
+                    logs: [],
+                    loot: []
+                };
+
+                campaigns.push(newCampaign);
+                currentCampaignId = newCampaign.id;
+            }
+
+            // 保存所有数据到服务器
+            const success = await saveAllData();
+            if (success) {
+                alert('保存成功');
+            } else {
+                alert('保存到服务器失败，数据已保存到本地');
+            }
+
+            // 更新UI
+            renderCampaignsList();
+            if (currentCampaignId) {
+                selectCampaign(currentCampaignId);
+            }
+
+            closeCampaignModal();
+        }
+
+        // 删除跑团
+        async function deleteCampaign(id) {
+            if (!confirm('确定要删除这个跑团吗？此操作无法撤销。')) {
+                return;
+            }
+
+            const index = campaigns.findIndex(c => c.id === id);
+            if (index !== -1) {
+                campaigns.splice(index, 1);
+
+                // 保存所有数据到服务器
+                await saveAllData();
+
+                // 更新UI
+                renderCampaignsList();
+
+                // 如果删除的是当前选中的跑团，清空右侧面板
+                if (currentCampaignId === id) {
+                    currentCampaignId = null;
+                    document.getElementById('campaignDetails').innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-hand-pointer"></i>
+                    <p>请从左侧选择一个跑团查看详细信息</p>
+                </div>
+            `;
+                    document.getElementById('playersSection').style.display = 'none';
+                    document.getElementById('detailTabs').style.display = 'none';
+                }
+            }
+        }
+
+        // 玩家模态框
+        function openPlayerModal(id = null) {
+            const modal = document.getElementById('playerModal');
+            const title = document.getElementById('playerModalTitle');
+            const form = document.getElementById('playerForm');
+
+            if (!currentCampaignId) {
+                alert('请先选择一个跑团');
+                return;
+            }
+
+            if (id) {
+                // 编辑模式
+                const campaign = campaigns.find(c => c.id === currentCampaignId);
+                if (!campaign) return;
+
+                const player = campaign.players.find(p => p.id === id);
+                if (!player) return;
+
+                title.textContent = '编辑玩家';
+                document.getElementById('playerId').value = player.id;
+                document.getElementById('playerName').value = player.playerName;
+                document.getElementById('characterName').value = player.characterName;
+                document.getElementById('characterClass').value = player.characterClass || '';
+                document.getElementById('playerNumber').value = player.number || '';
+                document.getElementById('playerFaction').value = player.faction || '';
+                document.getElementById('playerNotes').value = player.notes || '';
+            } else {
+                // 新建模式
+                title.textContent = '添加玩家';
+                form.reset();
+                document.getElementById('playerId').value = '';
+            }
+
+            modal.classList.add('active');
+        }
+
+        function closePlayerModal() {
+            document.getElementById('playerModal').classList.remove('active');
+        }
+
+        // 保存玩家
+        async function savePlayer(e) {
+            e.preventDefault();
+
+            if (!currentCampaignId) return;
+
+            const campaignIndex = campaigns.findIndex(c => c.id === currentCampaignId);
+            if (campaignIndex === -1) return;
+
+            const id = document.getElementById('playerId').value;
+            const playerName = document.getElementById('playerName').value.trim();
+            const characterName = document.getElementById('characterName').value.trim();
+            const characterClass = document.getElementById('characterClass').value.trim();
+            const number = document.getElementById('playerNumber').value.trim();
+            const faction = document.getElementById('playerFaction').value.trim();
+            const notes = document.getElementById('playerNotes').value.trim();
+
+            if (!playerName || !characterName) {
+                alert('请填写必填字段');
+                return;
+            }
+
+            if (!campaigns[campaignIndex].players) {
+                campaigns[campaignIndex].players = [];
+            }
+
+            if (id) {
+                // 更新现有玩家
+                const playerIndex = campaigns[campaignIndex].players.findIndex(p => p.id === id);
+                if (playerIndex !== -1) {
+                    campaigns[campaignIndex].players[playerIndex] = {
+                        ...campaigns[campaignIndex].players[playerIndex],
+                        playerName,
+                        characterName,
+                        characterClass,
+                        number,
+                        faction,
+                        notes
+                    };
+                }
+            } else {
+                // 创建新玩家
+                const newPlayer = {
+                    id: generateId(),
+                    playerName,
+                    characterName,
+                    characterClass,
+                    number,
+                    faction,
+                    notes
+                };
+
+                campaigns[campaignIndex].players.push(newPlayer);
+            }
+
+            // 保存所有数据到服务器
+            await saveAllData();
+
+            // 更新UI
+            renderPlayersList();
+            updateLootStats();
+
+            closePlayerModal();
+        }
+
+        // 删除玩家
+        async function deletePlayer(id) {
+            if (!confirm('确定要删除这个玩家吗？')) {
+                return;
+            }
+
+            if (!currentCampaignId) return;
+
+            const campaignIndex = campaigns.findIndex(c => c.id === currentCampaignId);
+            if (campaignIndex === -1) return;
+
+            const playerIndex = campaigns[campaignIndex].players.findIndex(p => p.id === id);
+            if (playerIndex !== -1) {
+                campaigns[campaignIndex].players.splice(playerIndex, 1);
+
+                // 保存所有数据到服务器
+                await saveAllData();
+
+                // 更新UI
+                renderPlayersList();
+                updateLootStats();
+            }
+        }
+
+        // 日志模态框
+        function openLogModal(id = null) {
+            const modal = document.getElementById('logModal');
+            const title = document.getElementById('logModalTitle');
+            const form = document.getElementById('logForm');
+
+            if (!currentCampaignId) {
+                alert('请先选择一个跑团');
+                return;
+            }
+
+            const campaign = campaigns.find(c => c.id === currentCampaignId);
+            if (!campaign) return;
+
+            // 填充玩家选择框
+            const playerSelect = document.getElementById('logPlayer');
+            playerSelect.innerHTML = '<option value="">请选择玩家</option>';
+
+            if (campaign.players && campaign.players.length > 0) {
+                campaign.players.forEach(player => {
+                    playerSelect.innerHTML += `<option value="${player.playerName}">${player.playerName} (${player.characterName})</option>`;
+                });
+            }
+
+            if (id) {
+                // 编辑模式
+                const log = campaign.logs.find(l => l.id === id);
+                if (!log) return;
+
+                title.textContent = '编辑日志';
+                document.getElementById('logId').value = log.id;
+                document.getElementById('logPlayer').value = log.player;
+                document.getElementById('logTime').value = log.time ? formatDateTimeForInput(log.time) : '';
+                document.getElementById('logSummary').value = log.summary;
+                document.getElementById('logDetails').value = log.details || '';
+            } else {
+                // 新建模式
+                title.textContent = '添加日志';
+                form.reset();
+                document.getElementById('logId').value = '';
+                document.getElementById('logTime').value = getLocalDateTime();
+            }
+
+            modal.classList.add('active');
+        }
+
+        function closeLogModal() {
+            document.getElementById('logModal').classList.remove('active');
+        }
+
+        // 保存日志
+        async function saveLog(e) {
+            e.preventDefault();
+
+            if (!currentCampaignId) return;
+
+            const campaignIndex = campaigns.findIndex(c => c.id === currentCampaignId);
+            if (campaignIndex === -1) return;
+
+            const id = document.getElementById('logId').value;
+            const player = document.getElementById('logPlayer').value;
+            const time = document.getElementById('logTime').value;
+            const summary = document.getElementById('logSummary').value.trim();
+            const details = document.getElementById('logDetails').value.trim();
+
+            if (!player || !time || !summary) {
+                alert('请填写必填字段');
+                return;
+            }
+
+            if (!campaigns[campaignIndex].logs) {
+                campaigns[campaignIndex].logs = [];
+            }
+
+            if (id) {
+                // 更新现有日志
+                const logIndex = campaigns[campaignIndex].logs.findIndex(l => l.id === id);
+                if (logIndex !== -1) {
+                    campaigns[campaignIndex].logs[logIndex] = {
+                        ...campaigns[campaignIndex].logs[logIndex],
+                        player,
+                        time,
+                        summary,
+                        details
+                    };
+                }
+            } else {
+                // 创建新日志
+                const newLog = {
+                    id: generateId(),
+                    player,
+                    time,
+                    summary,
+                    details
+                };
+
+                campaigns[campaignIndex].logs.push(newLog);
+            }
+
+            // 保存所有数据到服务器
+            await saveAllData();
+
+            // 更新UI
+            renderLogsList();
+
+            closeLogModal();
+        }
+
+        // 删除日志
+        async function deleteLog(id) {
+            if (!confirm('确定要删除这条日志吗？')) {
+                return;
+            }
+
+            if (!currentCampaignId) return;
+
+            const campaignIndex = campaigns.findIndex(c => c.id === currentCampaignId);
+            if (campaignIndex === -1) return;
+
+            const logIndex = campaigns[campaignIndex].logs.findIndex(l => l.id === id);
+            if (logIndex !== -1) {
+                campaigns[campaignIndex].logs.splice(logIndex, 1);
+
+                // 保存所有数据到服务器
+                await saveAllData();
+
+                // 更新UI
+                renderLogsList();
+            }
+        }
+
+        // Loot模态框
+        function openLootModal(id = null) {
+            const modal = document.getElementById('lootModal');
+            const title = document.getElementById('lootModalTitle');
+            const form = document.getElementById('lootForm');
+
+            if (!currentCampaignId) {
+                alert('请先选择一个跑团');
+                return;
+            }
+
+            const campaign = campaigns.find(c => c.id === currentCampaignId);
+            if (!campaign) return;
+
+            // 填充玩家选择框（归属人）
+            const ownerSelect = document.getElementById('lootOwner');
+            ownerSelect.innerHTML = '<option value="">未分配</option>';
+
+            if (campaign.players && campaign.players.length > 0) {
+                campaign.players.forEach(player => {
+                    ownerSelect.innerHTML += `<option value="${player.playerName}">${player.playerName} (${player.characterName})</option>`;
+                });
+            }
+
+            if (id) {
+                // 编辑模式
+                const loot = campaign.loot.find(l => l.id === id);
+                if (!loot) return;
+
+                title.textContent = '编辑战利品';
+                document.getElementById('lootId').value = loot.id;
+                document.getElementById('lootName').value = loot.name;
+                document.getElementById('lootQuantity').value = loot.quantity;
+                document.getElementById('lootPrice').value = loot.price;
+                document.getElementById('lootType').value = loot.type;
+                document.getElementById('lootOwner').value = loot.owner || '';
+                document.getElementById('lootAcquiredDate').value = loot.acquiredDate ? formatDateForInput(loot.acquiredDate) : '';
+                document.getElementById('lootSold').value = loot.sold || 'false';
+                document.getElementById('lootSoldPrice').value = loot.soldPrice || '';
+                document.getElementById('lootSoldQuantity').value = loot.soldQuantity || '';
+
+                // 显示/隐藏相关字段
+                const sold = loot.sold === 'true';
+                const soldPriceGroup = document.getElementById('soldPriceGroup');
+                const soldQuantityGroup = document.getElementById('soldQuantityGroup');
+                const ownerGroup = document.getElementById('ownerGroup');
+
+                if (sold) {
+                    soldPriceGroup.style.display = 'block';
+                    soldQuantityGroup.style.display = 'block';
+                    ownerGroup.style.display = 'none';
+                } else {
+                    soldPriceGroup.style.display = 'none';
+                    soldQuantityGroup.style.display = 'none';
+                    ownerGroup.style.display = 'block';
+                }
+            } else {
+                // 新建模式
+                title.textContent = '添加战利品';
+                form.reset();
+                document.getElementById('lootId').value = '';
+                document.getElementById('lootSold').value = 'false';
+                document.getElementById('lootSoldQuantity').value = '';
+                document.getElementById('soldPriceGroup').style.display = 'none';
+                document.getElementById('soldQuantityGroup').style.display = 'none';
+                document.getElementById('ownerGroup').style.display = 'block';
+                document.getElementById('lootAcquiredDate').value = formatDateForInput(new Date().toISOString());
+            }
+
+            modal.classList.add('active');
+        }
+
+        function closeLootModal() {
+            document.getElementById('lootModal').classList.remove('active');
+        }
+
+        // 保存战利品
+        async function saveLoot(e) {
+            e.preventDefault();
+
+            if (!currentCampaignId) return;
+
+            const campaignIndex = campaigns.findIndex(c => c.id === currentCampaignId);
+            if (campaignIndex === -1) return;
+
+            const id = document.getElementById('lootId').value;
+            const name = document.getElementById('lootName').value.trim();
+            const quantity = parseInt(document.getElementById('lootQuantity').value);
+            const price = parseFloat(document.getElementById('lootPrice').value);
+            const type = document.getElementById('lootType').value;
+            const acquiredDate = document.getElementById('lootAcquiredDate').value;
+            const sold = document.getElementById('lootSold').value;
+
+            let owner = '';
+            let soldPrice = null;
+            let soldQuantity = null;
+
+            if (sold === 'true') {
+                soldPrice = document.getElementById('lootSoldPrice').value ? parseFloat(document.getElementById('lootSoldPrice').value) : null;
+                soldQuantity = document.getElementById('lootSoldQuantity').value ? parseInt(document.getElementById('lootSoldQuantity').value) : null;
+            } else {
+                owner = document.getElementById('lootOwner').value;
+            }
+
+            if (!name || isNaN(quantity) || isNaN(price)) {
+                alert('请填写必填字段');
+                return;
+            }
+
+            if (!campaigns[campaignIndex].loot) {
+                campaigns[campaignIndex].loot = [];
+            }
+
+            if (id) {
+                // 更新现有Loot
+                const lootIndex = campaigns[campaignIndex].loot.findIndex(l => l.id === id);
+                if (lootIndex !== -1) {
+                    campaigns[campaignIndex].loot[lootIndex] = {
+                        ...campaigns[campaignIndex].loot[lootIndex],
+                        name,
+                        quantity,
+                        price,
+                        type,
+                        owner,
+                        acquiredDate,
+                        sold,
+                        soldPrice,
+                        soldQuantity
+                    };
+                }
+            } else {
+                // 创建新Loot
+                const newLoot = {
+                    id: generateId(),
+                    name,
+                    quantity,
+                    price,
+                    type,
+                    owner,
+                    acquiredDate,
+                    sold,
+                    soldPrice,
+                    soldQuantity,
+                    createDate: new Date().toISOString()  // 自动记录创建时间
+                };
+
+                campaigns[campaignIndex].loot.push(newLoot);
+            }
+
+            // 保存所有数据到服务器
+            await saveAllData();
+
+            // 更新UI
+            renderLootList();
+            updateLootStats();
+
+            closeLootModal();
+        }
+
+        // 删除战利品
+        async function deleteLoot(id) {
+            if (!confirm('确定要删除这个战利品记录吗？')) {
+                return;
+            }
+
+            if (!currentCampaignId) return;
+
+            const campaignIndex = campaigns.findIndex(c => c.id === currentCampaignId);
+            if (campaignIndex === -1) return;
+
+            const lootIndex = campaigns[campaignIndex].loot.findIndex(l => l.id === id);
+            if (lootIndex !== -1) {
+                campaigns[campaignIndex].loot.splice(lootIndex, 1);
+
+                // 保存所有数据到服务器
+                await saveAllData();
+
+                // 更新UI
+                renderLootList();
+                updateLootStats();
+            }
+        }
+
+        // 工具函数
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        // 显示日志详情模态框
+        function showLogDetail(log) {
+            const modal = document.getElementById('detailModal');
+            const title = document.getElementById('detailModalTitle');
+            const body = document.getElementById('detailModalBody');
+
+            title.textContent = `日志详情 - ${log.player}`;
+
+            if (log.details && log.details.trim()) {
+                body.textContent = log.details;
+                body.classList.remove('empty');
+            } else {
+                body.textContent = '暂无详述内容';
+                body.classList.add('empty');
+            }
+
+            modal.classList.add('active');
+
+            // 点击模态框背景关闭
+            modal.addEventListener('click', function (e) {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+
+            // ESC键关闭
+            document.addEventListener('keydown', function closeOnEsc(e) {
+                if (e.key === 'Escape') {
+                    modal.classList.remove('active');
+                    document.removeEventListener('keydown', closeOnEsc);
+                }
+            });
+        }
+
+        // 服务器地址（根据你的实际情况修改）
+        const SERVER_URL = 'http://39.106.239.169/跑团记录/save_data.php';
+
+        // 统一的保存数据函数
+        async function saveAllData() {
+            try {
+                // 保存到服务器
+                const response = await fetch(SERVER_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ campaigns: campaigns })
+                });
+
+                if (!response.ok) {
+                    throw new Error('保存到服务器失败');
+                }
+
+                const result = await response.json();
+
+                // 同时保存到本地存储作为备份
+                localStorage.setItem('trpg_campaigns', JSON.stringify(campaigns));
+
+                return result.success;
+            } catch (error) {
+                console.error('保存到服务器失败:', error);
+                // 降级到本地存储
+                localStorage.setItem('trpg_campaigns', JSON.stringify(campaigns));
+                return false;
+            }
+        }
+
+        // 从服务器加载数据
+        async function loadDataFromServer() {
+            try {
+                const response = await fetch(SERVER_URL);
+                if (!response.ok) {
+                    throw new Error('加载失败');
+                }
+
+                const data = await response.json();
+                if (data && data.campaigns) {
+                    // 成功从服务器加载，同时更新本地存储
+                    localStorage.setItem('trpg_campaigns', JSON.stringify(data.campaigns));
+                    return data.campaigns;
+                }
+                return [];
+            } catch (error) {
+                console.error('从服务器加载失败，使用本地数据:', error);
+                // 降级到本地存储
+                return JSON.parse(localStorage.getItem('trpg_campaigns')) || [];
+            }
+        }
+    </script>
+</body>
+
+</html>

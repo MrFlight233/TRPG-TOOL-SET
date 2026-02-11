@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>骰子模拟器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+            color: white;
+            padding: 15px;
+            padding-bottom: env(safe-area-inset-bottom, 15px);
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: clamp(20px, 5vw, 30px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: clamp(25px, 5vw, 40px);
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(79, 195, 247, 0.3);
+        }
+        
+        h1 {
+            font-size: clamp(2.2rem, 7vw, 3rem);
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #ff8a00, #da1b60);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            line-height: 1.2;
+        }
+        
+        .subtitle {
+            font-size: clamp(1rem, 3.5vw, 1.2rem);
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+        
+        .back-btn {
+            display: inline-block;
+            background: rgba(79, 195, 247, 0.2);
+            color: #4fc3f7;
+            padding: 10px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            border: 1px solid rgba(79, 195, 247, 0.3);
+        }
+        
+        .back-btn:hover {
+            background: rgba(79, 195, 247, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        
+        @media (min-width: 992px) {
+            .app-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        /* 控制面板 */
+        .control-panel {
+            background: rgba(30, 30, 50, 0.8);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: #4fc3f7;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(79, 195, 247, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            font-size: 1.2rem;
+        }
+        
+        /* 骰子组样式 */
+        .dice-groups {
+            margin-bottom: 25px;
+        }
+        
+        .dice-group {
+            background: rgba(40, 40, 60, 0.6);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .dice-group:hover {
+            border-color: rgba(79, 195, 247, 0.5);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .group-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+        
+        .group-number {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(45deg, #4fc3f7, #29b6f6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .group-name input {
+            flex: 1;
+            background: rgba(20, 20, 40, 0.8);
+            border: 1px solid rgba(79, 195, 247, 0.3);
+            border-radius: 8px;
+            padding: 10px 15px;
+            color: white;
+            font-size: 1rem;
+            min-width: 200px;
+        }
+        
+        .group-name input:focus {
+            outline: none;
+            border-color: #4fc3f7;
+            box-shadow: 0 0 0 2px rgba(79, 195, 247, 0.2);
+        }
+        
+        .dice-config {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .form-group label {
+            font-size: 0.9rem;
+            color: #e0e0e0;
+        }
+        
+        input, select {
+            background: rgba(20, 20, 40, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4fc3f7;
+            box-shadow: 0 0 0 2px rgba(79, 195, 247, 0.2);
+        }
+        
+        .modifier-input {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .modifier-input select {
+            width: 60px;
+            text-align: center;
+        }
+        
+        .modifier-input input {
+            flex: 1;
+        }
+        
+        .group-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .remove-btn {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .remove-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+        
+        /* 按钮样式 */
+        .add-btn {
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(39, 174, 96, 0.4);
+        }
+        
+        .warning-btn {
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .warning-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(243, 156, 18, 0.4);
+        }
+        
+        /* 全局调整值样式 */
+        .global-modifiers {
+            margin-bottom: 25px;
+        }
+        
+        .global-modifier {
+            background: rgba(40, 40, 60, 0.6);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        @media (max-width: 768px) {
+            .global-modifier {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* 期望值显示 */
+        .expectation-display {
+            background: linear-gradient(45deg, rgba(39, 174, 96, 0.2), rgba(46, 204, 113, 0.2));
+            border: 1px solid rgba(39, 174, 96, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .expectation-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #27ae60;
+            margin-bottom: 5px;
+        }
+        
+        .expectation-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        /* 结果显示 */
+        .result-display {
+            background: linear-gradient(45deg, rgba(79, 195, 247, 0.2), rgba(41, 182, 246, 0.2));
+            border: 1px solid rgba(79, 195, 247, 0.3);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .result-total {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #4fc3f7;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .result-expression {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-family: 'Monaco', 'Consolas', monospace;
+            word-break: break-word;
+        }
+        
+        /* 投掷按钮 */
+        .roll-btn {
+            background: linear-gradient(45deg, #9b59b6, #8e44ad);
+            color: white;
+            border: none;
+            padding: 16px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .roll-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(155, 89, 182, 0.4);
+        }
+        
+        .clear-btn {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 16px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .clear-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(231, 76, 60, 0.4);
+        }
+        
+        /* 历史记录面板 */
+        .history-panel {
+            background: rgba(30, 30, 50, 0.8);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* 统计网格 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .stat-card {
+            background: rgba(40, 40, 60, 0.6);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4fc3f7;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        /* 历史记录列表 */
+        .history-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding-right: 5px;
+        }
+        
+        .history-item {
+            background: rgba(40, 40, 60, 0.6);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .history-item:hover {
+            border-color: rgba(79, 195, 247, 0.5);
+            transform: translateX(5px);
+        }
+        
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .history-title {
+            font-weight: bold;
+            color: #e0e0e0;
+            font-size: 0.95rem;
+        }
+        
+        .history-time {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .history-result {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4fc3f7;
+            margin-bottom: 8px;
+        }
+        
+        .history-expression {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 12px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            word-break: break-word;
+        }
+        
+        .history-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .history-actions input {
+            flex: 1;
+            background: rgba(20, 20, 40, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: white;
+            font-size: 0.9rem;
+        }
+        
+        .history-actions button {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .reroll-btn {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+        }
+        
+        .delete-btn {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+        }
+        
+        .history-actions button:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* 历史记录操作按钮 */
+        .history-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .export-btn {
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(39, 174, 96, 0.4);
+        }
+        
+        .clear-history-btn {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .clear-history-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4);
+        }
+        
+        /* 自定义面数输入框 */
+        .custom-sides-input {
+            display: none;
+            margin-top: 10px;
+        }
+        
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: rgba(255, 255, 255, 0.5);
+            font-style: italic;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+        
+        /* 移动端优化 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+                border-radius: 12px;
+            }
+            
+            .control-panel, .history-panel {
+                padding: 20px;
+            }
+            
+            .dice-config {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .history-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .result-total {
+                font-size: 3rem;
+            }
+        }
+        
+        /* 防止IOS缩放 */
+        @supports (-webkit-overflow-scrolling: touch) {
+            input, select, textarea {
+                font-size: 16px !important;
+            }
+        }
+        
+        /* 安全区域适配 */
+        @supports (padding: max(0px)) {
+            body {
+                padding-left: max(15px, env(safe-area-inset-left, 15px));
+                padding-right: max(15px, env(safe-area-inset-right, 15px));
+                padding-bottom: max(15px, env(safe-area-inset-bottom, 15px));
+            }
+        }
+        
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(20, 20, 40, 0.6);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(79, 195, 247, 0.5);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(79, 195, 247, 0.8);
+        }
+        
+        /* 隐藏元素 */
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-dice"></i> 骰子模拟器</h1>
+            <p class="subtitle">TRPG跑团骰子工具 - 支持骰子组命名、全局调整值、期望值计算</p>
+            <a href="../index.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i> 返回首页
+            </a>
+        </header>
+        
+        <div class="app-container">
+            <!-- 左侧控制面板 -->
+            <div class="control-panel">
+                <!-- 骰子组设置 -->
+                <div class="dice-groups">
+                    <div class="section-title">
+                        <i class="fas fa-cube"></i> 骰子组设置
+                    </div>
+                    
+                    <div id="diceGroups">
+                        <!-- 骰子组将动态添加到这里 -->
+                        <div class="empty-state">
+                            <i class="fas fa-dice"></i>
+                            <p>暂无骰子组，点击下方按钮添加</p>
+                        </div>
+                    </div>
+                    
+                    <button onclick="addDiceGroup()" class="add-btn">
+                        <i class="fas fa-plus"></i> 添加骰子组
+                    </button>
+                </div>
+                
+                <!-- 全局调整值 -->
+                <div class="global-modifiers">
+                    <div class="section-title">
+                        <i class="fas fa-sliders-h"></i> 全局调整值
+                    </div>
+                    
+                    <div id="globalModifiers">
+                        <!-- 全局调整值将动态添加到这里 -->
+                        <div class="empty-state">
+                            <i class="fas fa-plus-circle"></i>
+                            <p>暂无全局调整值</p>
+                        </div>
+                    </div>
+                    
+                    <button onclick="addGlobalModifier()" class="warning-btn">
+                        <i class="fas fa-plus"></i> 添加全局调整值
+                    </button>
+                </div>
+                
+                <!-- 期望值显示 -->
+                <div class="expectation-display" id="expectationDisplay">
+                    <div class="expectation-value">0</div>
+                    <div class="expectation-label">期望值</div>
+                </div>
+                
+                <!-- 结果显示 -->
+                <div class="result-display" id="resultDisplay">
+                    <div class="result-total">0</div>
+                    <div class="result-expression">点击投掷查看结果</div>
+                </div>
+                
+                <!-- 操作按钮 -->
+                <button onclick="rollDice()" class="roll-btn">
+                    <i class="fas fa-dice"></i> 投掷骰子
+                </button>
+                
+                <button onclick="clearAllDice()" class="clear-btn">
+                    <i class="fas fa-trash"></i> 清空所有设置
+                </button>
+            </div>
+            
+            <!-- 右侧历史记录面板 -->
+            <div class="history-panel">
+                <div class="section-title">
+                    <i class="fas fa-history"></i> 投掷历史与统计
+                </div>
+                
+                <!-- 统计信息 -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalRolls">0</div>
+                        <div class="stat-label">总投掷次数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="averageResult">0</div>
+                        <div class="stat-label">平均结果</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="maxResult">0</div>
+                        <div class="stat-label">最大结果</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="minResult">0</div>
+                        <div class="stat-label">最小结果</div>
+                    </div>
+                </div>
+                
+                <!-- 历史记录列表 -->
+                <div class="history-list" id="historyList">
+                    <!-- 历史记录将动态添加到这里 -->
+                    <div class="empty-state">
+                        <i class="fas fa-history"></i>
+                        <p>暂无投掷记录</p>
+                    </div>
+                </div>
+                
+                <!-- 历史记录操作按钮 -->
+                <div class="history-buttons">
+                    <button onclick="exportHistory()" class="export-btn">
+                        <i class="fas fa-download"></i> 导出历史记录
+                    </button>
+                    <button onclick="clearHistory()" class="clear-history-btn">
+                        <i class="fas fa-trash"></i> 清空历史记录
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 应用状态
+        let diceGroups = [];
+        let globalModifiers = [];
+        let rollHistory = [];
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadHistory();
+            renderDiceGroups();
+            renderGlobalModifiers();
+            updateExpectation();
+        });
+        
+        // 添加骰子组
+        function addDiceGroup() {
+            diceGroups.push({
+                id: Date.now(),
+                name: `骰子组 ${diceGroups.length + 1}`,
+                count: 1,
+                sides: 6,
+                isCustomSides: false,
+                customSides: 6,
+                modifier: 0,
+                modifierType: '+'
+            });
+            renderDiceGroups();
+            updateExpectation();
+        }
+        
+        // 移除骰子组
+        function removeDiceGroup(id) {
+            diceGroups = diceGroups.filter(group => group.id !== id);
+            renderDiceGroups();
+            updateExpectation();
+        }
+        
+        // 渲染骰子组
+        function renderDiceGroups() {
+            const container = document.getElementById('diceGroups');
+            container.innerHTML = '';
+            
+            if (diceGroups.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-dice"></i>
+                        <p>暂无骰子组，点击下方按钮添加</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            diceGroups.forEach((group, index) => {
+                const groupElement = document.createElement('div');
+                groupElement.className = 'dice-group';
+                groupElement.innerHTML = `
+                    <div class="group-header">
+                        <div class="group-number">${index + 1}</div>
+                        <div class="group-name">
+                            <input type="text" value="${group.name}" placeholder="骰子组名称" 
+                                   onchange="updateDiceGroup(${group.id}, 'name', this.value)">
+                        </div>
+                    </div>
+                    <div class="dice-config">
+                        <div class="form-group">
+                            <label><i class="fas fa-dice"></i> 骰子数量</label>
+                            <input type="number" value="${group.count}" min="1" max="20" 
+                                   onchange="updateDiceGroup(${group.id}, 'count', this.value)">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-shapes"></i> 骰子面数</label>
+                            <select onchange="handleSidesChange(${group.id}, this.value)">
+                                <option value="2" ${!group.isCustomSides && group.sides == 2 ? 'selected' : ''}>D2</option>
+                                <option value="4" ${!group.isCustomSides && group.sides == 4 ? 'selected' : ''}>D4</option>
+                                <option value="6" ${!group.isCustomSides && group.sides == 6 ? 'selected' : ''}>D6</option>
+                                <option value="8" ${!group.isCustomSides && group.sides == 8 ? 'selected' : ''}>D8</option>
+                                <option value="10" ${!group.isCustomSides && group.sides == 10 ? 'selected' : ''}>D10</option>
+                                <option value="12" ${!group.isCustomSides && group.sides == 12 ? 'selected' : ''}>D12</option>
+                                <option value="20" ${!group.isCustomSides && group.sides == 20 ? 'selected' : ''}>D20</option>
+                                <option value="100" ${!group.isCustomSides && group.sides == 100 ? 'selected' : ''}>D100</option>
+                                <option value="custom" ${group.isCustomSides ? 'selected' : ''}>自定义</option>
+                            </select>
+                            <input type="number" id="customSides-${group.id}" 
+                                   value="${group.customSides}" min="1" max="1000000" 
+                                   class="custom-sides-input" 
+                                   onchange="updateDiceGroup(${group.id}, 'customSides', this.value)"
+                                   ${group.isCustomSides ? 'style="display: block;"' : ''}>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-adjust"></i> 调整值</label>
+                            <div class="modifier-input">
+                                <select onchange="updateDiceGroup(${group.id}, 'modifierType', this.value)">
+                                    <option value="+" ${group.modifierType === '+' ? 'selected' : ''}>+</option>
+                                    <option value="-" ${group.modifierType === '-' ? 'selected' : ''}>-</option>
+                                </select>
+                                <input type="number" value="${group.modifier}" min="-50" max="50"
+                                       onchange="updateDiceGroup(${group.id}, 'modifier', this.value)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="group-controls">
+                        <span style="color: rgba(255, 255, 255, 0.5); font-size: 0.85rem;">组 ${index + 1}</span>
+                        <button onclick="removeDiceGroup(${group.id})" class="remove-btn">
+                            <i class="fas fa-trash"></i> 移除
+                        </button>
+                    </div>
+                `;
+                container.appendChild(groupElement);
+            });
+        }
+        
+        // 处理面数选择变化
+        function handleSidesChange(groupId, value) {
+            const group = diceGroups.find(g => g.id === groupId);
+            if (group) {
+                if (value === 'custom') {
+                    group.isCustomSides = true;
+                    group.sides = group.customSides;
+                    const customInput = document.getElementById(`customSides-${groupId}`);
+                    if (customInput) {
+                        customInput.style.display = 'block';
+                        setTimeout(() => customInput.focus(), 300);
+                    }
+                } else {
+                    group.isCustomSides = false;
+                    group.sides = parseInt(value);
+                    group.customSides = parseInt(value);
+                    const customInput = document.getElementById(`customSides-${groupId}`);
+                    if (customInput) {
+                        customInput.style.display = 'none';
+                    }
+                }
+                updateExpectation();
+            }
+        }
+        
+        // 添加全局调整值
+        function addGlobalModifier() {
+            globalModifiers.push({
+                id: Date.now(),
+                name: `调整值 ${globalModifiers.length + 1}`,
+                value: 0,
+                type: '+'
+            });
+            renderGlobalModifiers();
+            updateExpectation();
+        }
+        
+        // 移除全局调整值
+        function removeGlobalModifier(id) {
+            globalModifiers = globalModifiers.filter(mod => mod.id !== id);
+            renderGlobalModifiers();
+            updateExpectation();
+        }
+        
+        // 渲染全局调整值
+        function renderGlobalModifiers() {
+            const container = document.getElementById('globalModifiers');
+            container.innerHTML = '';
+            
+            if (globalModifiers.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-plus-circle"></i>
+                        <p>暂无全局调整值</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            globalModifiers.forEach((modifier, index) => {
+                const modifierElement = document.createElement('div');
+                modifierElement.className = 'global-modifier';
+                modifierElement.innerHTML = `
+                    <input type="text" value="${modifier.name}" placeholder="调整值名称" 
+                           onchange="updateGlobalModifier(${modifier.id}, 'name', this.value)">
+                    <select onchange="updateGlobalModifier(${modifier.id}, 'type', this.value)">
+                        <option value="+" ${modifier.type === '+' ? 'selected' : ''}>加</option>
+                        <option value="-" ${modifier.type === '-' ? 'selected' : ''}>减</option>
+                    </select>
+                    <input type="number" value="${modifier.value}" min="-100" max="100"
+                           onchange="updateGlobalModifier(${modifier.id}, 'value', this.value)">
+                    <button onclick="removeGlobalModifier(${modifier.id})" class="remove-btn" style="width: 100%;">
+                        <i class="fas fa-trash"></i> 删除
+                    </button>
+                `;
+                container.appendChild(modifierElement);
+            });
+        }
+        
+        // 更新骰子组
+        function updateDiceGroup(id, field, value) {
+            const group = diceGroups.find(g => g.id === id);
+            if (group) {
+                if (field === 'count' || field === 'sides' || field === 'modifier' || field === 'customSides') {
+                    const intValue = parseInt(value) || 0;
+                    group[field] = intValue;
+                    
+                    if (field === 'customSides' && group.isCustomSides) {
+                        group.sides = intValue;
+                    }
+                } else {
+                    group[field] = value;
+                }
+                updateExpectation();
+            }
+        }
+        
+        // 更新全局调整值
+        function updateGlobalModifier(id, field, value) {
+            const modifier = globalModifiers.find(m => m.id === id);
+            if (modifier) {
+                if (field === 'value') {
+                    modifier[field] = parseInt(value) || 0;
+                } else {
+                    modifier[field] = value;
+                }
+                updateExpectation();
+            }
+        }
+        
+        // 计算期望值
+        function calculateExpectation() {
+            let expectation = 0;
+            
+            // 计算每个骰子组的期望值
+            diceGroups.forEach((group) => {
+                const groupExpectation = group.count * (group.sides + 1) / 2;
+                let adjustedExpectation = groupExpectation;
+                
+                if (group.modifierType === '+') {
+                    adjustedExpectation += group.modifier;
+                } else {
+                    adjustedExpectation -= group.modifier;
+                }
+                
+                const truncatedExpectation = Math.trunc(adjustedExpectation);
+                expectation += truncatedExpectation;
+            });
+            
+            // 应用全局调整值
+            globalModifiers.forEach(modifier => {
+                if (modifier.type === '+') {
+                    expectation += modifier.value;
+                } else {
+                    expectation -= modifier.value;
+                }
+            });
+            
+            return expectation;
+        }
+        
+        // 更新期望值显示
+        function updateExpectation() {
+            const expectation = calculateExpectation();
+            document.getElementById('expectationDisplay').innerHTML = `
+                <div class="expectation-value">${expectation}</div>
+                <div class="expectation-label">期望值</div>
+            `;
+        }
+        
+        // 投掷单个骰子
+        function rollSingleDice(sides) {
+            return Math.floor(Math.random() * sides) + 1;
+        }
+        
+        // 投掷所有骰子
+        function rollDice() {
+            // 添加投掷动画
+            const resultDisplay = document.getElementById('resultDisplay');
+            const originalTotal = resultDisplay.querySelector('.result-total').textContent;
+            const originalExpression = resultDisplay.querySelector('.result-expression').textContent;
+            
+            resultDisplay.innerHTML = `
+                <div class="result-total" style="animation: diceRoll 0.5s ease-in-out infinite;">🎲</div>
+                <div class="result-expression">投掷中...</div>
+            `;
+            
+            // 添加动画样式
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes diceRoll {
+                    0% { transform: rotate(0deg); }
+                    25% { transform: rotate(90deg); }
+                    50% { transform: rotate(180deg); }
+                    75% { transform: rotate(270deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            setTimeout(() => {
+                document.head.removeChild(style);
+                
+                let total = 0;
+                let details = [];
+                let rollExpression = '';
+                
+                // 投掷每个骰子组
+                diceGroups.forEach((group, index) => {
+                    let groupTotal = 0;
+                    let groupRolls = [];
+                    
+                    // 投掷该组的所有骰子
+                    for (let i = 0; i < group.count; i++) {
+                        const roll = rollSingleDice(group.sides);
+                        groupRolls.push(roll);
+                        groupTotal += roll;
+                    }
+                    
+                    // 应用组调整值
+                    if (group.modifierType === '+') {
+                        groupTotal += group.modifier;
+                    } else {
+                        groupTotal -= group.modifier;
+                    }
+                    
+                    total += groupTotal;
+                    
+                    // 构建表达式
+                    let groupExpression = '';
+                    if (group.count > 1) {
+                        groupExpression += `(${groupRolls.join('+')})`;
+                    } else {
+                        groupExpression += groupRolls[0];
+                    }
+                    
+                    if (group.modifier !== 0) {
+                        groupExpression += `${group.modifierType}${group.modifier}`;
+                    }
+                    
+                    rollExpression += group.name + ': ' + groupExpression;
+                    if (index < diceGroups.length - 1) {
+                        rollExpression += ' + ';
+                    }
+                    
+                    details.push({
+                        name: group.name,
+                        count: group.count,
+                        sides: group.sides,
+                        rolls: groupRolls,
+                        modifier: group.modifier,
+                        modifierType: group.modifierType,
+                        groupTotal: groupTotal
+                    });
+                });
+                
+                // 应用全局调整值
+                let globalExpression = '';
+                globalModifiers.forEach((modifier, index) => {
+                    if (modifier.type === '+') {
+                        total += modifier.value;
+                        globalExpression += ` + ${modifier.name}: ${modifier.value}`;
+                    } else {
+                        total -= modifier.value;
+                        globalExpression += ` - ${modifier.name}: ${modifier.value}`;
+                    }
+                });
+                
+                rollExpression += globalExpression;
+                
+                // 如果没有骰子组，只有全局调整值
+                if (diceGroups.length === 0 && globalModifiers.length > 0) {
+                    rollExpression = '仅全局调整值: ' + globalExpression.substring(3);
+                } else if (diceGroups.length === 0 && globalModifiers.length === 0) {
+                    rollExpression = '无骰子投掷';
+                    total = 0;
+                }
+                
+                // 显示结果
+                resultDisplay.innerHTML = `
+                    <div class="result-total">${total}</div>
+                    <div class="result-expression">${rollExpression}</div>
+                `;
+                
+                // 添加结果动画
+                resultDisplay.style.animation = 'resultAppear 0.5s ease-out';
+                setTimeout(() => {
+                    resultDisplay.style.animation = '';
+                }, 500);
+                
+                // 保存到历史记录
+                const historyItem = {
+                    id: Date.now(),
+                    timestamp: new Date().toLocaleString('zh-CN'),
+                    total: total,
+                    expression: rollExpression,
+                    details: details,
+                    globalModifiers: [...globalModifiers],
+                    note: diceGroups.length > 0 ? 
+                        `${diceGroups.map(g => g.name).join(' + ')} 投掷` : 
+                        '仅全局调整值投掷'
+                };
+                
+                rollHistory.unshift(historyItem);
+                saveHistory();
+                renderHistory();
+                updateStats();
+            }, 800);
+        }
+        
+        // 清空所有设置
+        function clearAllDice() {
+            if (diceGroups.length === 0 && globalModifiers.length === 0) {
+                return;
+            }
+            
+            if (confirm('确定要清空所有骰子组和调整值吗？')) {
+                diceGroups = [];
+                globalModifiers = [];
+                renderDiceGroups();
+                renderGlobalModifiers();
+                document.getElementById('resultDisplay').innerHTML = `
+                    <div class="result-total">0</div>
+                    <div class="result-expression">点击投掷查看结果</div>
+                `;
+                updateExpectation();
+            }
+        }
+        
+        // 渲染历史记录
+        function renderHistory() {
+            const container = document.getElementById('historyList');
+            container.innerHTML = '';
+            
+            if (rollHistory.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-history"></i>
+                        <p>暂无投掷记录</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            rollHistory.forEach(item => {
+                const historyElement = document.createElement('div');
+                historyElement.className = 'history-item';
+                historyElement.innerHTML = `
+                    <div class="history-header">
+                        <div class="history-title">${item.note}</div>
+                        <div class="history-time">${item.timestamp}</div>
+                    </div>
+                    <div class="history-result">${item.total}</div>
+                    <div class="history-expression">${item.expression}</div>
+                    <div class="history-actions">
+                        <input type="text" placeholder="添加备注..." onchange="updateNote(${item.id}, this.value)" 
+                               value="${item.note}">
+                        <button onclick="reroll(${item.id})" class="reroll-btn">
+                            <i class="fas fa-redo"></i> 重新投掷
+                        </button>
+                        <button onclick="deleteHistory(${item.id})" class="delete-btn">
+                            <i class="fas fa-trash"></i> 删除
+                        </button>
+                    </div>
+                `;
+                container.appendChild(historyElement);
+            });
+        }
+        
+        // 更新统计信息
+        function updateStats() {
+            if (rollHistory.length === 0) {
+                document.getElementById('totalRolls').textContent = '0';
+                document.getElementById('averageResult').textContent = '0';
+                document.getElementById('maxResult').textContent = '0';
+                document.getElementById('minResult').textContent = '0';
+                return;
+            }
+            
+            const total = rollHistory.length;
+            const sum = rollHistory.reduce((acc, item) => acc + item.total, 0);
+            const max = Math.max(...rollHistory.map(item => item.total));
+            const min = Math.min(...rollHistory.map(item => item.total));
+            const average = Math.trunc(sum / total);
+            
+            document.getElementById('totalRolls').textContent = total;
+            document.getElementById('averageResult').textContent = average;
+            document.getElementById('maxResult').textContent = max;
+            document.getElementById('minResult').textContent = min;
+        }
+        
+        // 更新备注
+        function updateNote(id, note) {
+            const item = rollHistory.find(h => h.id === id);
+            if (item && note.trim()) {
+                item.note = note.trim();
+                saveHistory();
+                renderHistory();
+            }
+        }
+        
+        // 重新投掷
+        function reroll(id) {
+            const originalItem = rollHistory.find(h => h.id === id);
+            if (originalItem) {
+                // 这里可以实现重新投掷逻辑，暂时简单复制
+                const newItem = {
+                    ...originalItem,
+                    id: Date.now(),
+                    timestamp: new Date().toLocaleString('zh-CN'),
+                    note: originalItem.note + ' (重新投掷)'
+                };
+                rollHistory.unshift(newItem);
+                saveHistory();
+                renderHistory();
+                updateStats();
+            }
+        }
+        
+        // 删除历史记录
+        function deleteHistory(id) {
+            rollHistory = rollHistory.filter(h => h.id !== id);
+            saveHistory();
+            renderHistory();
+            updateStats();
+        }
+        
+        // 清空历史记录
+        function clearHistory() {
+            if (rollHistory.length === 0) return;
+            
+            if (confirm('确定要清空所有历史记录吗？')) {
+                rollHistory = [];
+                saveHistory();
+                renderHistory();
+                updateStats();
+            }
+        }
+        
+        // 导出历史记录
+        function exportHistory() {
+            if (rollHistory.length === 0) {
+                alert('暂无历史记录可导出');
+                return;
+            }
+            
+            const dataStr = JSON.stringify(rollHistory, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `dice_history_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // 保存历史记录到本地存储
+        function saveHistory() {
+            localStorage.setItem('diceRollHistory', JSON.stringify(rollHistory));
+        }
+        
+        // 从本地存储加载历史记录
+        function loadHistory() {
+            const saved = localStorage.getItem('diceRollHistory');
+            if (saved) {
+                rollHistory = JSON.parse(saved);
+                renderHistory();
+                updateStats();
+            }
+        }
+        
+        // 添加动画样式
+        const animationStyle = document.createElement('style');
+        animationStyle.textContent = `
+            @keyframes resultAppear {
+                0% { opacity: 0; transform: scale(0.8); }
+                100% { opacity: 1; transform: scale(1); }
+            }
+        `;
+        document.head.appendChild(animationStyle);
+    </script>
+</body>
+</html>
