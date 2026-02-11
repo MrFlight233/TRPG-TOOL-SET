@@ -16,28 +16,12 @@
         }
 
         body {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+            background: #f0f2f5;
             min-height: 100vh;
-            color: white;
+            color: #1f2937;
             padding: 10px;
             padding-bottom: env(safe-area-inset-bottom, 10px);
             overflow-x: hidden;
-        }
-
-        @keyframes gradientBG {
-            0% {
-                background-position: 0% 50%;
-            }
-
-            50% {
-                background-position: 100% 50%;
-            }
-
-            100% {
-                background-position: 0% 50%;
-            }
         }
 
         .container {
@@ -45,12 +29,11 @@
             width: 95vw;
             min-width: 1200px;
             min-height: 800px;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
+            background: #fff;
+            border-radius: 8px;
             padding: clamp(15px, 3vw, 25px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
             margin: 5px auto;
         }
 
@@ -60,43 +43,38 @@
         }
 
         h1 {
-            font-size: clamp(1.8rem, 6vw, 2.8rem);
+            font-size: clamp(1.6rem, 5vw, 2.25rem);
             margin-bottom: 6px;
-            background: linear-gradient(to right, #ff8a00, #da1b60);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            color: #111827;
+            font-weight: 600;
             line-height: 1.2;
         }
 
         .subtitle {
             font-size: clamp(0.85rem, 2.5vw, 1rem);
-            opacity: 0.8;
+            color: #94989f;
             line-height: 1.4;
         }
 
         .back-btn {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 50px;
+            display: inline-flex;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            color: #6b7280;
+            padding: 10px 18px;
+            border-radius: 6px;
             text-decoration: none;
-            font-size: 0.85rem;
-            transition: all 0.3s ease;
-            display: flex;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            transition: background 0.2s, border-color 0.2s;
             align-items: center;
-            gap: 5px;
-            z-index: 100;
+            gap: 8px;
         }
 
         .back-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
+            background: #e5e7eb;
+            border-color: #d1d5db;
+            color: #111827;
         }
 
         .main-content {
@@ -129,11 +107,10 @@
             flex: 1;
             min-width: 200px;
             max-width: 300px;
-            background: rgba(30, 30, 50, 0.8);
-            border-radius: 10px;
+            background: #f9fafb;
+            border-radius: 8px;
             padding: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            border: 1px solid #e5e7eb;
             display: flex;
             flex-direction: column;
             max-height: none;
@@ -147,33 +124,32 @@
             align-items: center;
             margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid #e5e7eb;
         }
 
         .panel-header h2 {
-            font-size: 1.3rem;
-            color: #4fc3f7;
+            font-size: 1.2rem;
+            color: #111827;
+            font-weight: 600;
         }
 
         .btn-primary {
-            background: linear-gradient(45deg, #2196F3, #21CBF3);
-            color: white;
+            background: #2563eb;
+            color: #fff;
             padding: 6px 12px;
             font-size: 0.85rem;
-            font-weight: bold;
+            font-weight: 500;
             border: none;
-            border-radius: 50px;
+            border-radius: 6px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
+            transition: background 0.2s;
             display: flex;
             align-items: center;
             gap: 5px;
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(33, 150, 243, 0.6);
+            background: #1d4ed8;
         }
 
         .campaigns-list {
@@ -183,19 +159,21 @@
         }
 
         .campaign-item {
-            background: rgba(40, 40, 60, 0.6);
+            background: #fff;
             border-radius: 8px;
             padding: 12px;
             margin-bottom: 10px;
-            border-left: 4px solid #4fc3f7;
+            border: 1px solid #e5e7eb;
+            border-left: 4px solid #2563eb;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: background 0.2s, border-color 0.2s;
             position: relative;
         }
 
         .campaign-item:hover {
-            background: rgba(50, 50, 70, 0.8);
-            transform: translateX(5px);
+            background: #f9fafb;
+            border-color: #d1d5db;
+            border-left-color: #2563eb;
         }
 
         .campaign-item.active {
@@ -207,7 +185,7 @@
             font-size: 1.1rem;
             font-weight: bold;
             margin-bottom: 4px;
-            color: #4fc3f7;
+            color: #2563eb;
         }
 
         .campaign-gm {
@@ -239,7 +217,7 @@
         .btn-icon {
             background: rgba(255, 255, 255, 0.1);
             border: none;
-            color: white;
+            color: #1f2937;
             width: 28px;
             height: 28px;
             border-radius: 50%;
@@ -258,11 +236,10 @@
         /* 右侧详细信息 */
         .details-panel {
             flex: 2;
-            background: rgba(30, 30, 50, 0.8);
-            border-radius: 10px;
+            background: #fff;
+            border-radius: 8px;
             padding: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            border: 1px solid #e5e7eb;
             display: flex;
             flex-direction: column;
             max-height: none;
@@ -304,7 +281,7 @@
 
         .detail-value {
             font-size: 1rem;
-            color: #e0e0e0;
+            color: #374151;
         }
 
         /* 玩家列表 */
@@ -326,13 +303,13 @@
 
         .section-header h2 {
             font-size: 1.3rem;
-            color: #4fc3f7;
+            color: #2563eb;
         }
 
         /* Tab导航 */
         .tabs {
             display: flex;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid #e5e7eb;
             margin-bottom: 15px;
         }
 
@@ -340,7 +317,7 @@
             padding: 10px 15px;
             background: transparent;
             border: none;
-            color: rgba(255, 255, 255, 0.7);
+            color: #94989f;
             font-size: 0.95rem;
             cursor: pointer;
             position: relative;
@@ -348,11 +325,11 @@
         }
 
         .tab-btn:hover {
-            color: white;
+            color: #1f2937;
         }
 
         .tab-btn.active {
-            color: #4fc3f7;
+            color: #2563eb;
         }
 
         .tab-btn.active::after {
@@ -362,7 +339,7 @@
             left: 0;
             width: 100%;
             height: 3px;
-            background: #4fc3f7;
+            background: #2563eb;
             border-radius: 3px 3px 0 0;
         }
 
@@ -389,12 +366,12 @@
         }
 
         .data-table th {
-            background: rgba(79, 195, 247, 0.2);
+            background: #f9fafb;
             padding: 10px 12px;
             text-align: left;
             font-weight: bold;
-            color: #4fc3f7;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: #2563eb;
+            border-bottom: 1px solid #e5e7eb;
             cursor: pointer;
             user-select: none;
         }
@@ -416,7 +393,7 @@
         }
 
         .data-table th.sortable:hover {
-            background: rgba(79, 195, 247, 0.3);
+            background: #f3f4f6;
         }
 
         .data-table th.sortable:hover i {
@@ -424,12 +401,12 @@
         }
 
         .data-table th.sortable i.fa-sort-up {
-            color: #4fc3f7;
+            color: #2563eb;
             opacity: 1;
         }
 
         .data-table th.sortable i.fa-sort-down {
-            color: #4fc3f7;
+            color: #2563eb;
             opacity: 1;
         }
 
@@ -441,11 +418,11 @@
 
         .data-table td {
             padding: 10px 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid #e5e7eb;
         }
 
         .data-table tr:hover {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f9fafb;
         }
 
         /* 操作按钮横向排列 */
@@ -458,13 +435,13 @@
         .empty-state {
             text-align: center;
             padding: 30px 15px;
-            color: rgba(255, 255, 255, 0.5);
+            color: #9ca3af;
         }
 
         .empty-state i {
             font-size: 2.5rem;
             margin-bottom: 12px;
-            opacity: 0.5;
+            color: #d1d5db;
         }
 
         /* 表单模态框 */
@@ -486,14 +463,15 @@
         }
 
         .modal-content {
-            background: rgba(30, 30, 50, 0.95);
-            border-radius: 12px;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
             padding: 20px;
             width: 95%;
             max-width: 500px;
             max-height: 90vh;
             overflow-y: auto;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e5e7eb;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
@@ -506,13 +484,13 @@
 
         .modal-header h3 {
             font-size: 1.3rem;
-            color: #4fc3f7;
+            color: #2563eb;
         }
 
         .close-btn {
             background: transparent;
             border: none;
-            color: white;
+            color: #1f2937;
             font-size: 1.3rem;
             cursor: pointer;
             width: 36px;
@@ -535,29 +513,29 @@
         .form-group label {
             display: block;
             margin-bottom: 6px;
-            color: #e0e0e0;
+            color: #374151;
             font-size: 0.9rem;
         }
 
         .form-control {
             width: 100%;
             padding: 10px 12px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: #fff;
+            border: 1px solid #d1d5db;
             border-radius: 6px;
-            color: white;
+            color: #1f2937;
             font-size: 0.95rem;
-            transition: all 0.3s ease;
+            transition: border-color 0.2s;
         }
 
         /* 优化下拉框样式 */
         select.form-control {
-            background-color: rgba(40, 40, 60, 0.9);
-            color: #ffffff;
+            background-color: #fff;
+            color: #1f2937;
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234fc3f7'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232563eb'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
             background-repeat: no-repeat;
             background-position: right 12px center;
             background-size: 18px;
@@ -565,15 +543,15 @@
         }
 
         select.form-control option {
-            background-color: #2a2a3a;
-            color: #ffffff;
+            background-color: #fff;
+            color: #1f2937;
             padding: 10px;
         }
 
         .form-control:focus {
             outline: none;
-            border-color: #4fc3f7;
-            box-shadow: 0 0 0 2px rgba(79, 195, 247, 0.2);
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
         }
 
         .form-row {
@@ -594,7 +572,7 @@
 
         .btn-secondary {
             background: rgba(255, 255, 255, 0.1);
-            color: white;
+            color: #1f2937;
             padding: 8px 16px;
             border: none;
             border-radius: 50px;
@@ -613,9 +591,9 @@
             gap: 12px;
             margin: 15px 0;
             padding: 12px;
-            background: rgba(40, 40, 60, 0.6);
+            background: #f3f4f6;
             border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e5e7eb;
             justify-content: space-between;
             align-items: center;
         }
@@ -626,14 +604,14 @@
             padding: 12px;
             flex: 1;
             min-width: 130px;
-            border-left: 4px solid #4fc3f7;
+            border-left: 4px solid #2563eb;
             text-align: center;
         }
 
         .stat-card h4 {
             font-size: 0.95rem;
             margin-bottom: 8px;
-            color: #4fc3f7;
+            color: #2563eb;
         }
 
         .stat-value {
@@ -714,8 +692,8 @@
                 -webkit-overflow-scrolling: touch;
                 margin-bottom: 12px;
                 border-radius: 6px;
-                background: rgba(30, 30, 50, 0.6);
-                border: 1px solid rgba(255, 255, 255, 0.1);
+                background: #f9fafb;
+                border: 1px solid #e5e7eb;
             }
 
             .data-table {
@@ -990,10 +968,9 @@
             }
 
             .back-btn {
-                top: 5px;
-                left: 5px;
-                padding: 5px 10px;
+                padding: 8px 14px;
                 font-size: 0.75rem;
+                margin-top: 8px;
             }
 
             h1 {
@@ -1053,7 +1030,7 @@
             border-collapse: collapse;
             margin-top: 8px;
             margin-bottom: 15px;
-            background: rgba(30, 30, 50, 0.8);
+            background: #f9fafb;
             border-radius: 8px;
             overflow: hidden;
         }
@@ -1063,7 +1040,7 @@
             padding: 8px 12px;
             text-align: left;
             font-weight: bold;
-            color: #4fc3f7;
+            color: #2563eb;
         }
 
         .players-distribution-table td {
@@ -1121,7 +1098,7 @@
         .filter-label {
             font-size: 0.85rem;
             margin-bottom: 4px;
-            color: #e0e0e0;
+            color: #374151;
         }
 
         .filter-input {
@@ -1129,7 +1106,7 @@
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 5px;
-            color: white;
+            color: #1f2937;
             font-size: 0.9rem;
         }
 
@@ -1155,14 +1132,14 @@
 
         .filter-input:focus {
             outline: none;
-            border-color: #4fc3f7;
+            border-color: #2563eb;
             box-shadow: 0 0 0 2px rgba(79, 195, 247, 0.2);
         }
 
         /* 重置按钮 */
         .filter-reset-btn {
             background: rgba(255, 255, 255, 0.1);
-            color: white;
+            color: #1f2937;
             padding: 6px 12px;
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 5px;
@@ -1183,10 +1160,10 @@
             flex-direction: column;
             gap: 12px;
             margin: 15px 0;
-            background: rgba(40, 40, 60, 0.6);
+            background: #f3f4f6;
             border-radius: 8px;
             padding: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e5e7eb;
         }
 
         /* 紧凑型统计卡片 */
@@ -1194,7 +1171,7 @@
             background: rgba(79, 195, 247, 0.1);
             border-radius: 6px;
             padding: 12px;
-            border-left: 4px solid #4fc3f7;
+            border-left: 4px solid #2563eb;
             display: flex;
             align-items: center;
             gap: 12px;
@@ -1203,7 +1180,7 @@
 
         .compact-stat-card h4 {
             font-size: 0.95rem;
-            color: #4fc3f7;
+            color: #2563eb;
             margin: 0;
             white-space: nowrap;
         }
@@ -1222,7 +1199,7 @@
 
         #playersDistributionTable h3 {
             font-size: 1.1rem;
-            color: #4fc3f7;
+            color: #2563eb;
             margin-bottom: 12px;
             display: flex;
             align-items: center;
@@ -1335,7 +1312,7 @@
             word-wrap: break-word;
             line-height: 1.3;
             padding: 6px 8px;
-            color: #e0e0e0;
+            color: #374151;
         }
 
         .log-details-cell {
@@ -1346,7 +1323,7 @@
             padding: 6px 8px;
             cursor: pointer;
             position: relative;
-            color: #e0e0e0;
+            color: #374151;
         }
 
         .log-details-cell:hover {
@@ -1393,7 +1370,7 @@
             max-width: 600px;
             max-height: 80vh;
             overflow-y: auto;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e5e7eb;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
@@ -1403,19 +1380,19 @@
             align-items: center;
             margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid #e5e7eb;
         }
 
         .detail-modal-header h3 {
             font-size: 1.2rem;
-            color: #4fc3f7;
+            color: #2563eb;
             margin: 0;
         }
 
         .detail-modal-body {
             font-size: 0.95rem;
             line-height: 1.5;
-            color: #e0e0e0;
+            color: #374151;
             white-space: pre-wrap;
             word-wrap: break-word;
             max-height: 60vh;
@@ -1431,7 +1408,7 @@
         .detail-close-btn {
             background: rgba(255, 255, 255, 0.1);
             border: none;
-            color: white;
+            color: #1f2937;
             width: 32px;
             height: 32px;
             border-radius: 50%;
@@ -1478,7 +1455,7 @@
         .share-btn {
             background: rgba(79, 195, 247, 0.2);
             border: 1px solid rgba(79, 195, 247, 0.4);
-            color: #4fc3f7;
+            color: #2563eb;
             padding: 6px 12px;
             border-radius: 18px;
             cursor: pointer;
@@ -1544,7 +1521,7 @@
         }
 
         .share-link {
-            color: #4fc3f7;
+            color: #2563eb;
             text-decoration: none;
         }
 
@@ -1555,14 +1532,14 @@
 
         .share-instructions {
             font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.7);
+            color: #94989f;
             margin-top: 8px;
             line-height: 1.3;
         }
 
         .copy-btn {
             background: linear-gradient(45deg, #4CAF50, #8BC34A);
-            color: white;
+            color: #1f2937;
             padding: 6px 12px;
             font-size: 0.85rem;
             font-weight: bold;
@@ -1596,13 +1573,14 @@
 <body>
     <!-- 保持HTML内容不变 -->
     <div class="container">
-        <a href="../index.html" class="back-btn">
-            <i class="fas fa-arrow-left"></i> 返回首页
-        </a>
-
         <header>
             <h1>跑团信息记录</h1>
             <p class="subtitle">管理您的跑团信息、玩家记录、游戏日志和战利品分配</p>
+            <p>
+                <a href="../index.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> 返回首页
+                </a>
+            </p>
         </header>
 
         <div class="main-content">
@@ -2727,9 +2705,9 @@
             const totalValueElement = document.getElementById('totalValue');
             if (unsoldValue > 0 && unsoldValue !== totalValue) {
                 totalValueElement.innerHTML = `
-                    <span style="font-size: 0.9rem; color: #4fc3f7;">总价值：</span><span style="font-size: 0.9rem; color: #ff8a00;">${totalValue.toFixed(2)} gp</span>
+                    <span style="font-size: 0.9rem; color: #2563eb;">总价值：</span><span style="font-size: 0.9rem; color: #ff8a00;">${totalValue.toFixed(2)} gp</span>
                     <br>
-                    <span style="font-size: 0.9rem; color: #4fc3f7;">未出售：</span><span style="font-size: 0.9rem; color: #ff8a00;">${unsoldValue.toFixed(2)} gp</span>`;
+                    <span style="font-size: 0.9rem; color: #2563eb;">未出售：</span><span style="font-size: 0.9rem; color: #ff8a00;">${unsoldValue.toFixed(2)} gp</span>`;
             } else {
                 totalValueElement.textContent = totalValue.toFixed(2) + ' gp';
             }
