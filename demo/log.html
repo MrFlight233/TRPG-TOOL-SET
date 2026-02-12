@@ -567,7 +567,7 @@
         <header>
             <h1><i class="fas fa-coins"></i> LOOT 记录</h1>
             <p class="subtitle">快速记录战利品，支持表格内编辑与分配统计 · 数据保存在本机</p>
-            <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> 返回首页</a>
+            <a href="../index.html" class="back-btn"><i class="fas fa-arrow-left"></i> 返回首页</a>
         </header>
 
         <!-- 快速添加 -->
@@ -747,28 +747,49 @@
     </div>
 
     <script>
-        const STORAGE_KEY = 'trpg_loot_page';
-        const PLAYERS_KEY = 'trpg_loot_players';
-
         let loots = [];
         let players = [];
 
-        function loadData() {
+        // API 基础 URL
+        const API_BASE = 'api.php';
+        // const API_BASE = 'http://39.106.239.169/demo/api.php';
+
+        // 初始化数据库
+        async function initDatabase() {
             try {
-                const raw = localStorage.getItem(STORAGE_KEY);
-                if (raw) loots = JSON.parse(raw);
-                else loots = [];
-            } catch (e) { loots = []; }
-            try {
-                const raw = localStorage.getItem(PLAYERS_KEY);
-                if (raw) players = JSON.parse(raw);
-                else players = [];
-            } catch (e) { players = []; }
+                const response = await fetch(API_BASE + '?action=init');
+                const result = await response.json();
+                console.log('数据库初始化:', result);
+            } catch (error) {
+                console.error('数据库初始化失败:', error);
+            }
         }
 
-        function saveData() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(loots));
-            localStorage.setItem(PLAYERS_KEY, JSON.stringify(players));
+        // 加载数据
+        async function loadData() {
+            try {
+                // 加载 loot 数据
+                const lootResponse = await fetch(API_BASE + '?action=get_loots');
+                const lootResult = await lootResponse.json();
+                if (lootResult.status === 'success') {
+                    loots = lootResult.data;
+                } else {
+                    loots = [];
+                }
+
+                // 加载 players 数据
+                const playerResponse = await fetch(API_BASE + '?action=get_players');
+                const playerResult = await playerResponse.json();
+                if (playerResult.status === 'success') {
+                    players = playerResult.data;
+                } else {
+                    players = [];
+                }
+            } catch (error) {
+                console.error('加载数据失败:', error);
+                loots = [];
+                players = [];
+            }
         }
 
         function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
@@ -875,13 +896,31 @@
             });
         }
 
-        function updateLootField(id, field, value) {
+        // 更新 loot 字段
+        async function updateLootField(id, field, value) {
             const l = loots.find(x => x.id === id);
             if (!l) return;
+            
+            // 更新本地数据
             if (field === 'quantity') l.quantity = Math.max(1, value);
             else if (field === 'owner') l.owner = value || null;
             else if (field === 'sold') l.sold = value;
-            saveData();
+            
+            // 调用 API 更新数据库
+            try {
+                const response = await fetch(API_BASE + '?action=update_loot', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(l)
+                });
+                const result = await response.json();
+                console.log('更新 loot:', result);
+            } catch (error) {
+                console.error('更新 loot 失败:', error);
+            }
+            
             renderTable();
         }
 
@@ -897,10 +936,30 @@
             document.getElementById('unsoldValue').textContent = unsold.toFixed(2);
         }
 
-        function deleteLoot(id) {
+        // 删除 loot
+        async function deleteLoot(id) {
             if (!confirm('确定删除这条记录？')) return;
+            
+            // 从本地数据中删除
             loots = loots.filter(l => l.id !== id);
-            saveData();
+            
+            // 调用 API 删除数据库中的记录（使用 POST 请求）
+            try {
+                const response = await fetch(API_BASE + '?action=delete_loot_post', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id })
+                });
+                const result = await response.json();
+                console.log('删除 loot:', result);
+            } catch (error) {
+                console.error('删除 loot 失败:', error);
+                // 重新加载数据
+                await loadData();
+            }
+            
             renderTable();
         }
 
@@ -935,7 +994,7 @@
             document.getElementById('detailModal').classList.remove('active');
         }
 
-        document.getElementById('detailForm').addEventListener('submit', e => {
+        document.getElementById('detailForm').addEventListener('submit', async e => {
             e.preventDefault();
             const id = document.getElementById('detailId').value;
             const payload = {
@@ -948,37 +1007,64 @@
                 acquiredDate: document.getElementById('detailDate').value || null,
                 note: document.getElementById('detailNote').value.trim() || null
             };
-            if (id) {
-                const l = loots.find(x => x.id === id);
-                if (l) {
-                    l.name = payload.name;
-                    l.quantity = payload.quantity;
-                    l.price = payload.price;
-                    l.type = payload.type;
-                    l.owner = payload.owner;
-                    l.sold = payload.sold;
-                    l.acquiredDate = payload.acquiredDate;
-                    l.note = payload.note;
+            
+            try {
+                if (id) {
+                    // 更新现有记录
+                    const l = loots.find(x => x.id === id);
+                    if (l) {
+                        // 更新本地数据
+                        Object.assign(l, payload);
+                        
+                        // 调用 API 更新数据库
+                        const response = await fetch(API_BASE + '?action=update_loot', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(l)
+                        });
+                        const result = await response.json();
+                        console.log('更新 loot:', result);
+                    }
+                } else {
+                    // 添加新记录
+                    const newLoot = {
+                        id: uid(),
+                        ...payload,
+                        createDate: new Date().toISOString()
+                    };
+                    loots.push(newLoot);
+                    
+                    // 调用 API 添加到数据库
+                    const response = await fetch(API_BASE + '?action=add_loot', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(newLoot)
+                    });
+                    const result = await response.json();
+                    console.log('添加 loot:', result);
                 }
-            } else {
-                loots.push({
-                    id: uid(),
-                    ...payload,
-                    createDate: new Date().toISOString()
-                });
+                
+                renderTable();
+                closeDetailModal();
+            } catch (error) {
+                console.error('保存 loot 失败:', error);
+                alert('保存失败，请重试');
             }
-            saveData();
-            renderTable();
-            closeDetailModal();
         });
 
-        document.getElementById('quickAddBtn').addEventListener('click', () => {
+        document.getElementById('quickAddBtn').addEventListener('click', async () => {
             const name = document.getElementById('quickName').value.trim();
             const qty = parseInt(document.getElementById('quickQty').value, 10) || 1;
             const price = parseFloat(document.getElementById('quickPrice').value) || 0;
             const type = document.getElementById('quickType').value;
             if (!name) { alert('请输入名称'); return; }
-            loots.push({
+            
+            // 创建新 loot 对象
+            const newLoot = {
                 id: uid(),
                 name,
                 quantity: Math.max(1, qty),
@@ -989,37 +1075,97 @@
                 acquiredDate: new Date().toISOString().slice(0, 10),
                 note: null,
                 createDate: new Date().toISOString()
-            });
-            document.getElementById('quickName').value = '';
-            document.getElementById('quickQty').value = '1';
-            document.getElementById('quickPrice').value = '';
-            saveData();
-            renderTable();
+            };
+            
+            try {
+                // 添加到本地数据
+                loots.push(newLoot);
+                
+                // 调用 API 添加到数据库
+                const response = await fetch(API_BASE + '?action=add_loot', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(newLoot)
+                });
+                const result = await response.json();
+                console.log('添加 loot:', result);
+                
+                // 清空表单
+                document.getElementById('quickName').value = '';
+                document.getElementById('quickQty').value = '1';
+                document.getElementById('quickPrice').value = '';
+                
+                renderTable();
+            } catch (error) {
+                console.error('添加 loot 失败:', error);
+                alert('添加失败，请重试');
+                // 从本地数据中移除
+                loots = loots.filter(l => l.id !== newLoot.id);
+            }
         });
 
-        document.getElementById('newPlayerName').addEventListener('keydown', e => {
+        document.getElementById('newPlayerName').addEventListener('keydown', async e => {
             if (e.key !== 'Enter') return;
             e.preventDefault();
             const name = document.getElementById('newPlayerName').value.trim();
             if (!name || players.includes(name)) return;
-            players.push(name);
-            document.getElementById('newPlayerName').value = '';
-            saveData();
-            renderPlayerTags();
-            refreshFilterOwner();
-            renderOwnerOptions(document.getElementById('detailOwner'));
-            renderTable();
+            
+            try {
+                // 添加到本地数据
+                players.push(name);
+                document.getElementById('newPlayerName').value = '';
+                
+                // 调用 API 添加到数据库
+                const response = await fetch(API_BASE + '?action=add_player', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name })
+                });
+                const result = await response.json();
+                console.log('添加 player:', result);
+                
+                renderPlayerTags();
+                refreshFilterOwner();
+                renderOwnerOptions(document.getElementById('detailOwner'));
+                renderTable();
+            } catch (error) {
+                console.error('添加 player 失败:', error);
+                // 从本地数据中移除
+                players = players.filter(p => p !== name);
+                alert('添加玩家失败，请重试');
+            }
         });
 
         function renderPlayerTags() {
             const el = document.getElementById('playerTags');
-            el.innerHTML = players.map((p, i) => `<span class="tag">${escapeHtml(p)} <i class="fas fa-times remove" data-index="${i}"></i></span>`).join('');
+            el.innerHTML = players.map((p, i) => `<span class="tag">${escapeHtml(p)} <i class="fas fa-times remove" data-name="${escapeAttr(p)}"></i></span>`).join('');
             el.querySelectorAll('.remove').forEach(node => {
-                node.addEventListener('click', () => {
-                    const idx = parseInt(node.dataset.index, 10);
-                    if (idx >= 0 && idx < players.length) {
-                        players.splice(idx, 1);
-                        saveData();
+                node.addEventListener('click', async () => {
+                    const name = node.dataset.name;
+                    if (!name) return;
+                    
+                    try {
+                        // 从本地数据中移除
+                        players = players.filter(p => p !== name);
+                        
+                        // 调用 API 从数据库中删除
+                        const response = await fetch(API_BASE + `?action=delete_player&name=${encodeURIComponent(name)}`, {
+                            method: 'DELETE'
+                        });
+                        const result = await response.json();
+                        console.log('删除 player:', result);
+                        
+                        renderPlayerTags();
+                        refreshFilterOwner();
+                        renderTable();
+                    } catch (error) {
+                        console.error('删除 player 失败:', error);
+                        // 重新加载玩家列表
+                        await loadData();
                         renderPlayerTags();
                         refreshFilterOwner();
                         renderTable();
@@ -1028,7 +1174,7 @@
             });
         }
 
-        document.getElementById('splitGoldBtn').addEventListener('click', () => {
+        document.getElementById('splitGoldBtn').addEventListener('click', async () => {
             const n = parseInt(document.getElementById('splitN').value, 10);
             if (n < 2) { alert('人数至少为 2'); return; }
             const goldItems = loots.filter(l => l.type === '金币' && l.sold !== 'true' && !l.owner);
@@ -1041,26 +1187,63 @@
             if (names.length < n) {
                 for (let i = names.length; i < n; i++) names.push(`玩家${i + 1}`);
             }
-            goldItems.forEach(l => {
-                l.sold = 'true';
-                l.owner = null;
-            });
-            names.forEach((name, i) => {
-                loots.push({
-                    id: uid(),
-                    name: '金币（均分）',
-                    quantity: 1,
-                    price: Math.round(per * 100) / 100,
-                    type: '金币',
-                    owner: name,
-                    sold: 'false',
-                    acquiredDate: new Date().toISOString().slice(0, 10),
-                    note: `均分自 ${totalGold.toFixed(2)} gp，${n} 人`,
-                    createDate: new Date().toISOString()
-                });
-            });
-            saveData();
-            renderTable();
+            
+            try {
+                // 更新现有金币物品状态
+                for (const l of goldItems) {
+                    l.sold = 'true';
+                    l.owner = null;
+                    
+                    // 调用 API 更新数据库
+                    const response = await fetch(API_BASE + '?action=update_loot', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(l)
+                    });
+                    await response.json();
+                }
+                
+                // 创建并添加新的均分金币记录
+                const newLoots = [];
+                for (const name of names) {
+                    const newLoot = {
+                        id: uid(),
+                        name: '金币（均分）',
+                        quantity: 1,
+                        price: Math.round(per * 100) / 100,
+                        type: '金币',
+                        owner: name,
+                        sold: 'false',
+                        acquiredDate: new Date().toISOString().slice(0, 10),
+                        note: `均分自 ${totalGold.toFixed(2)} gp，${n} 人`,
+                        createDate: new Date().toISOString()
+                    };
+                    loots.push(newLoot);
+                    newLoots.push(newLoot);
+                }
+                
+                // 批量添加新记录到数据库
+                for (const newLoot of newLoots) {
+                    const response = await fetch(API_BASE + '?action=add_loot', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(newLoot)
+                    });
+                    await response.json();
+                }
+                
+                renderTable();
+            } catch (error) {
+                console.error('均分金币失败:', error);
+                alert('均分金币失败，请重试');
+                // 重新加载数据
+                await loadData();
+                renderTable();
+            }
         });
 
         function exportCsv() {
@@ -1130,11 +1313,25 @@
         document.getElementById('exportCsv').addEventListener('click', exportCsv);
         document.getElementById('copySummary').addEventListener('click', copySummary);
 
-        loadData();
-        renderPlayerTags();
-        refreshFilterOwner();
-        renderTable();
-        document.getElementById('viewCompact').classList.add('active');
+        // 页面初始化
+        async function initPage() {
+            try {
+                // 初始化数据库
+                await initDatabase();
+                // 加载数据
+                await loadData();
+                // 渲染页面
+                renderPlayerTags();
+                refreshFilterOwner();
+                renderTable();
+                document.getElementById('viewCompact').classList.add('active');
+            } catch (error) {
+                console.error('页面初始化失败:', error);
+            }
+        }
+
+        // 启动初始化
+        initPage();
     </script>
 </body>
 

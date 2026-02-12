@@ -1,0 +1,35 @@
+# 忽略数据库文件
+loot.db
+demo/loot.db
+
+# 忽略 pathfinder 文件夹中除 web.config 外的所有文件
+小工具/file/*
+!小工具/file/web.config
+
+# 忽略 borders 文件夹中除 部分用来示例的文件 外的所有文件
+小工具/borders/*
+!小工具/borders/tolist.bat
+!小工具/borders/circle.png
+!小工具/borders/合集
+!小工具/borders/合集/circle1.png
+
+# 忽略临时文件
+*.tmp
+*.temp
+
+# 忽略编辑器配置文件
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 忽略操作系统文件
+Thumbs.db
+.DS_Store
+
+# 忽略日志文件
+*.log
+
+# 忽略备份文件
+*.bak
+*.backup
